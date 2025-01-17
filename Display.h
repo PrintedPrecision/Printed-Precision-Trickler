@@ -17,7 +17,7 @@
 
 // Current software version
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 5
+#define VERSION_MINOR 6
 // Display constants
 #define LCD_COLS 20
 #define LCD_ROWS 4
@@ -29,16 +29,16 @@ bool LcdSetup();
 void WaitingToCalibrate();
 void CalibrationScreen();
 
-void IdleScreen(float targetWeight);
-void ReadyScreen(float targetWeight);
+void IdleScreen(float targetWeight, float errorMargin);
+void ReadyScreen(float targetWeight, float errorMargin);
 
-void BulkScreen(float targetWeight);
-void TrickleScreen(float targetWeight);
+void BulkScreen(float targetWeight, float errorMargin);
+void TrickleScreen(float targetWeight, float errorMargin);
 
-void GoodChargeScreen(float targetWeight, float finalWeight, int duration);
-void OverthrowScreen(float targetWeight, float finalWeight, int duration);
+void GoodChargeScreen(float targetWeight, float finalWeight, int duration, float errorMargin);
+void OverthrowScreen(float targetWeight, float finalWeight, int duration, float errorMargin);
 
-void noErrorTopLines();
+void noErrorTopLines(float errorMargin);
 void eraseTopLines();
 
 void clearLine(int line);

@@ -73,6 +73,7 @@ bool waitForTrickle();
 void increaseBulkCalibration();
 void decreaseBulkCalibration();
 void increaseTrickleCalibration();
+void smallIncreaseTrickleCalibration();
 void decreaseTrickleCalibration();
 
 

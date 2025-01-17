@@ -49,7 +49,8 @@ double dispenseWeight = 0;
 double targetWeight = 32.00; // Default target weight of 32.00gr
 long startTime = 0;
 long endTime = 0;
-float secondBulkCalibration = 0.95;
+float secondBulkCalibration = 0.7;
+double errorMargin = 0.02;
 
 // Evaluate state variables
 double evaluateWeight = 0;
@@ -125,11 +126,11 @@ int CalibrationState()
   Serial.print(initialWeight, 6);
   Serial.println("'");
 
-  for(int i = 0; i < 5; i++)
+  for(int i = 0; i < 4; i++)
   {
     Serial.print("Starting #");
     Serial.print(i+1);
-    Serial.println(" of 5 targetWeight bulk dispenses");
+    Serial.println(" of 4 targetWeight bulk dispenses");
 
     if(!bulkThrow(targetWeight))
     {
@@ -139,7 +140,7 @@ int CalibrationState()
       return IDLE_STATE;
     }
 
-    delay(375);
+    delay(500);
   }
 
   Serial.println("Gathering final weight for bulk calibration");
@@ -152,12 +153,12 @@ int CalibrationState()
 
   // Calculate the total revs dispensed and total weight dispensed
   float targetRevs = targetWeight / GetBulkWeight();
-  float totalRevs = targetRevs * 5;
+  float totalRevs = targetRevs * 4;
 
   float totalWeight = finalWeight - initialWeight;
 
-  // Calculate the calibrated grainsPerRev based on these totals
-  float newGrainsPerRev = totalWeight / totalRevs;
+  // Calculate the calibrated grainsPerRev based on these totals (and adjust up by 5% to avoid early overthrows)
+  float newGrainsPerRev = (totalWeight / totalRevs) * 1.05;
 
   Serial.print("totalRevs = ");
   Serial.println(totalRevs, 6);
@@ -167,7 +168,7 @@ int CalibrationState()
   Serial.println(newGrainsPerRev, 6);
 
   // Verify calibration value is within range
-  if((30 < newGrainsPerRev) && (newGrainsPerRev < 100))
+  if((20 < newGrainsPerRev) && (newGrainsPerRev < 150))
   {
     Serial.println("Bulk calibration value in range, updating grainsPerRev");
     SetBulkWeight(newGrainsPerRev);
@@ -186,18 +187,19 @@ int CalibrationState()
   // Gather initial stable weight
   initialWeight = finalWeight;
 
-  Serial.print("Starting calibration trickle of 300 kernels, initial weight = '");
+  Serial.print("Starting calibration trickle of 100 kernels, initial weight = '");
   Serial.print(initialWeight, 6);
   Serial.println("'");
 
-  // Request 300 kernels to be dropped
-  for(int i = 0; i < 8; i++)
+  // Request 200 kernels to be dropped
+  /*
+  for(int i = 0; i < 4; i++)
   {
     Serial.print("Starting #");
     Serial.print(i+1);
-    Serial.println(" of eight 40 kernel trickle dispenses");
+    Serial.println(" of four 25 kernel trickle dispenses");
 
-    TrickleDispense(40);
+    TrickleDispense(25);
     if(!waitForTrickle())
     {
       Serial.println("Calibration failed/cancelled during the trickle throws");
@@ -208,15 +210,15 @@ int CalibrationState()
 
     delay(375);
   }
-
+  */
+  TrickleDispense(200);
   if(!waitForTrickle())
   {
-    Serial.println("Calibration failed/cancelled during the trickle throw");
-    // Reset flags and return to idle state
+    Serial.println("Calibration failed/cancelled during the trickle throws");
+    // Reset flags and return to idle state b/c enable toggle was switched off
     firstIdleUpdate = true;
     return IDLE_STATE;
   }
-
   
   Serial.println("Gathering final weight");
   // Gather final stable weight
@@ -226,18 +228,30 @@ int CalibrationState()
   Serial.print(finalWeight, 6);
   Serial.println("'");
 
-  // Calculate average kernelWeight
+  // Calculate average kernelWeight (and adjust it up by 5% to avoid early overtrickles)
   float weightDiff = finalWeight - initialWeight;
-  float kernelAverage = weightDiff / 300;
+  float kernelAverage = (weightDiff / 200) * 1.05;
 
   // Verify kernelAverage is within range
-  if((0.01 < kernelAverage) && (0.1 > kernelAverage))
+  if((0.01 < kernelAverage) && (0.12 > kernelAverage))
   {
     // If within range, update the kernelWeight and return
     SetKernelWeight(kernelAverage);
     Serial.print("New kernelWeight = '");
     Serial.print(kernelAverage, 6);
     Serial.println("'");
+
+    // Adjust the errorMargin in case of chonky kernels
+    if(kernelAverage > 0.03 && kernelAverage <= 0.05)
+    {
+      Serial.println("Setting errorMargin to 0.04 because of kernelWeight");
+      errorMargin = 0.04;
+    }
+    else if(kernelAverage > 0.05)
+    {
+      Serial.println("Setting errorMargin to 0.06 because of kernelWeight");
+      errorMargin = 0.06;
+    }
 
     firstIdleUpdate = true;
     return IDLE_STATE;
@@ -284,7 +298,7 @@ int IdleState()
   {
     btnIncrements = 0;
     Serial.println("Entered Idle state for first time, updating display");
-    IdleScreen(targetWeight);
+    IdleScreen(targetWeight, errorMargin);
     firstIdleUpdate = false;
   }
 
@@ -377,21 +391,21 @@ int IdleState()
     if(btnIncrements >= 15 && targetTenthsDigit == 0)
     {
       changeTarget(1);
-      IdleScreen(targetWeight);
+      IdleScreen(targetWeight, errorMargin);
       Serial.print("Incrementing target by 1gr, targetWeight = ");
       Serial.println(targetWeight, 6);
     }
     else if(btnIncrements >= 5 && targetHundrethsDigit == 0)
     {
       changeTarget(0.1);
-      IdleScreen(targetWeight);
+      IdleScreen(targetWeight, errorMargin);
       Serial.print("Incrementing target by 0.1gr, targetWeight = ");
       Serial.println(targetWeight, 6);
     }
     else
     {
       changeTarget(0.02);
-      IdleScreen(targetWeight);
+      IdleScreen(targetWeight, errorMargin);
       Serial.print("Incrementing target by 0.2gr, targetWeight = ");
       Serial.println(targetWeight, 6);
     }
@@ -439,21 +453,21 @@ int IdleState()
     if(btnIncrements >= 15 && targetTenthsDigit == 0)
     {
       changeTarget(-1);
-      IdleScreen(targetWeight);
+      IdleScreen(targetWeight, errorMargin);
       Serial.print("Decrementing target by 1gr, targetWeight = ");
       Serial.println(targetWeight, 6);
     }
     else if(btnIncrements >= 5 && targetHundrethsDigit == 0)
     {
       changeTarget(-0.1);
-      IdleScreen(targetWeight);
+      IdleScreen(targetWeight, errorMargin);
       Serial.print("Decrementing target by 0.1gr, targetWeight = ");
       Serial.println(targetWeight, 6);
     }
     else
     {
       changeTarget(-0.02);
-      IdleScreen(targetWeight);
+      IdleScreen(targetWeight, errorMargin);
       Serial.print("Decrementing target by 0.2gr, targetWeight = ");
       Serial.println(targetWeight, 6);
     }
@@ -501,7 +515,7 @@ int ReadyState()
   if(firstReadyUpdate)
   {
     Serial.println("Entered Ready state for first time, updating display");
-    ReadyScreen(targetWeight);
+    ReadyScreen(targetWeight, errorMargin);
     firstReadyUpdate = false;
   }
 
@@ -582,7 +596,7 @@ int DispenseState()
   // Do bulk dispense if required
   if(weightDiff > 1)
   {
-    BulkScreen(targetWeight);
+    BulkScreen(targetWeight, errorMargin);
     // Dispense 97% of the required amount
     // BulkDispense(weightDiff * 0.97);
     
@@ -601,7 +615,7 @@ int DispenseState()
     weightDiff = targetWeight - dispenseWeight;
 
     // Overthrow case, adjust calibration
-    if(weightDiff < -0.03)
+    if(weightDiff < (-1.2 * errorMargin))
     {
       Serial.println("First bulk pulse overthrow, exiting to evaluate");
       increaseBulkCalibration();
@@ -609,7 +623,7 @@ int DispenseState()
       return EVALUATE_STATE;
     }
     // Perfect throw case
-    else if(weightDiff < 0.01)
+    else if(weightDiff < (0.8 * errorMargin))
     {
       // Go to evaluate state
       Serial.println("1st bulk pulse hit exact targetWeight, exiting to evaluate");
@@ -647,8 +661,15 @@ int DispenseState()
       dispenseWeight = StableWeight(SHORT);
       weightDiff = targetWeight - dispenseWeight;
 
+      // Take a long measurement if the weightDiff is small
+      if(weightDiff < 0.1 && weightDiff > -0.1)
+      {
+        dispenseWeight = StableWeight(LONG);
+        weightDiff = targetWeight - dispenseWeight;
+      }
+
       // Overthrow case
-      if(weightDiff < -0.03)
+      if(weightDiff < (-1.2 * errorMargin))
       {
         Serial.println("Second bulk pulse overthrow, exiting to evaluate");
         secondBulkCalibration = secondBulkCalibration - 0.02;
@@ -658,7 +679,7 @@ int DispenseState()
         return EVALUATE_STATE;
       }
       // Perfect throw case
-      else if(weightDiff < 0.01)
+      else if(weightDiff < (0.8 * errorMargin))
       {
         // Go to evaluate state
         Serial.println("2nd bulk pulse hit exact targetWeight, exiting to evaluate");
@@ -682,19 +703,21 @@ int DispenseState()
 
         // Do not exit dispense state in this instance
       }
+
+      TrickleScreen(targetWeight, errorMargin);
     }
   }
   // Now do a final trickle, on first entry we already have a current weight and weightDiff from above sections of code
   while(isEnabled())
   {
-    // If weightDiff is 0.02 or less, re-measure the weight just in case
-    if(weightDiff < 0.03)
+    // If weightDiff is one kernel or less, re-measure the weight just in case
+    if(weightDiff < (1.2 * errorMargin))
     {
       dispenseWeight = StableWeight(LONG);
       weightDiff = targetWeight - dispenseWeight;
 
       // If target weight has been reached, go to Evaluate state
-      if(weightDiff < 0.01)
+      if(weightDiff < (0.8 * errorMargin))
       {
         return EVALUATE_STATE;
       }
@@ -709,7 +732,7 @@ int DispenseState()
     Serial.println(remainder, 6);
 
     // Check the remainder to see if we need to add an extra kernel
-    if(remainder >= 0.01)
+    if(remainder >= (0.8 * errorMargin))
     {
       Serial.print("Adding kernel because remainder = ");
       Serial.println(remainder, 6);
@@ -717,7 +740,7 @@ int DispenseState()
     }
     
     // If weightDiff is non-zero but kernels rounds to 0 (shouldn't happen anymore with the remainder check)
-    if(!kernels && (weightDiff > 0.01))
+    if(!kernels && (weightDiff > (0.8 * errorMargin)))
     {
       Serial.println("Setting kernels to 1 because of zero kernels but a postiive weight diff, this shouldn't happen anymore");
       kernels = 1;
@@ -771,8 +794,16 @@ int DispenseState()
     weightDiff = targetWeight - dispenseWeight;
 
     // Overthrow case
-    if(weightDiff < -0.03)
+    if(weightDiff < (-1.2 * errorMargin))
     {
+      // Handle case of overthrow only 1 tick past errorMargin (0.02 over) on a long throw
+      if(kernels > 15 && (weightDiff > ((-1.2 * errorMargin) - 0.02)))
+      {
+        Serial.println("Tiny overthrow on a long trickle, exiting to evaluate");
+        smallIncreaseTrickleCalibration();
+
+        return EVALUATE_STATE;
+      }
       // Increase trickler calibration before going to evaluate
       Serial.println("Trickler overthrow, exiting to evaluate");
       increaseTrickleCalibration();
@@ -780,7 +811,7 @@ int DispenseState()
       return EVALUATE_STATE;
     }
     // Perfect throw case
-    else if(weightDiff < 0.01)
+    else if(weightDiff < (0.8 * errorMargin))
     {
       // Go to evaluate state
       Serial.println("Trickled to correct targetWeight, exiting to evaluate");
@@ -799,7 +830,8 @@ int DispenseState()
       }
       Serial.println("Trickle did not reach targetWeight, restarting the trickle");
 
-      if(weightDiff > 0.061)
+      // Adjust calibration for underthrow of at least 4 kernels
+      if(weightDiff > (3 * errorMargin))
       {
         decreaseTrickleCalibration();
       }
@@ -930,11 +962,11 @@ int EvaluateState()
 
   // Determine evaluation display update based on weightDiff
   // Case 1 - overthrow
-  if(weightDiff < -0.03)
+  if(weightDiff < (-1.2 * errorMargin))
   {
     // Change the display
     Serial.println("Overthrow detected in Evaluate State");
-    OverthrowScreen(targetWeight, evaluateWeight, elapsedTime);
+    OverthrowScreen(targetWeight, evaluateWeight, elapsedTime, errorMargin);
 
     // Illuminate the Red LED after turning the others off
     digitalWrite(YELLOW_LED, LOW);
@@ -942,11 +974,11 @@ int EvaluateState()
     digitalWrite(RED_LED, HIGH);
   }
   // Case 2 - correct weight
-  else if(weightDiff < 0.01)
+  else if(weightDiff < (0.8 * errorMargin))
   {
     // Change the display
     Serial.println("Acceptable charge detected in Evaluate State");
-    GoodChargeScreen(targetWeight, evaluateWeight, elapsedTime);
+    GoodChargeScreen(targetWeight, evaluateWeight, elapsedTime, errorMargin);
 
     // Illuminate the Green LED after turning the others off
     digitalWrite(YELLOW_LED, LOW);
@@ -960,7 +992,7 @@ int EvaluateState()
     firstEvaluate = true;
     evaluateUpdate = true;
 
-    // Handle extreme underthrow
+    // Handle extreme underthrow (this should never happen)
     if(weightDiff > targetWeight * 0.5)
     {
       // Reset LEDs before exiting evaluate
@@ -1152,6 +1184,16 @@ void increaseTrickleCalibration()
   SetKernelWeight(curKernel * 1.03);
 
   Serial.print("Adjusting calibration up by 3%, kernelWeight = ");
+  Serial.println(GetKernelWeight(), 6);
+}
+
+void smallIncreaseTrickleCalibration()
+{
+  // Adjust kernel weight to be slightly larger
+  float curKernel = GetKernelWeight();
+  SetKernelWeight(curKernel * 1.01);
+
+  Serial.print("Adjusting calibration up by 1%, kernelWeight = ");
   Serial.println(GetKernelWeight(), 6);
 }
 

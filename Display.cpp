@@ -23,7 +23,14 @@ bool LcdSetup()
   lcd.begin(LCD_COLS, LCD_ROWS);
 
   // Print display lines 1 and 2
-  noErrorTopLines();
+  lcd.setCursor(0,0);
+  lcd.print(LINE1);
+  
+  lcd.setCursor(0,1);
+  lcd.print(LINE2);
+  lcd.print(VERSION_MAJOR);
+  lcd.print(".");
+  lcd.print(VERSION_MINOR);
 
   // Print display line 3
   lcd.setCursor(0,2);
@@ -43,7 +50,14 @@ bool LcdSetup()
 void WaitingToCalibrate()
 {
   // Print display lines 1 and 2
-  noErrorTopLines();
+  lcd.setCursor(0,0);
+  lcd.print(LINE1);
+  
+  lcd.setCursor(0,1);
+  lcd.print(LINE2);
+  lcd.print(VERSION_MAJOR);
+  lcd.print(".");
+  lcd.print(VERSION_MINOR);
 
   // Print display line 3
   lcd.setCursor(0,2);
@@ -59,22 +73,30 @@ void WaitingToCalibrate()
 void CalibrationScreen()
 {
   // Print display lines 1 and 2
-  noErrorTopLines();
+  lcd.setCursor(0,0);
+  lcd.print(LINE1);
+  
+  lcd.setCursor(0,1);
+  lcd.print(LINE2);
+  lcd.print(VERSION_MAJOR);
+  lcd.print(".");
+  lcd.print(VERSION_MINOR);
 
   // Print display line 3
   clearLine(2);
 
   // Print display line 4
+  clearLine(3);
   lcd.setCursor(0,3);
   lcd.print(" Calibrating Powder ");
 }
 
 // IdleScreen()
 // Displayed during the idle state
-void IdleScreen(float targetWeight)
+void IdleScreen(float targetWeight, float errorMargin)
 {
   // Print display lines 1 and 2
-  noErrorTopLines();
+  noErrorTopLines(errorMargin);
 
   // Print display line 3
   clearLine(2);
@@ -82,16 +104,17 @@ void IdleScreen(float targetWeight)
   lcd.print(targetWeight);
 
   // Print display line 4
+  clearLine(3);
   lcd.setCursor(0,3);
   lcd.print("  Waiting to Start  ");
 }
 
 // ReadyScreen()
 // Displayed during the ready state
-void ReadyScreen(float targetWeight)
+void ReadyScreen(float targetWeight, float errorMargin)
 {
   // Print display lines 1 and 2
-  noErrorTopLines();
+  noErrorTopLines(errorMargin);
 
   // Print display line 3
   clearLine(2);
@@ -99,16 +122,17 @@ void ReadyScreen(float targetWeight)
   lcd.print(targetWeight);
 
   // Print display line 4
+  clearLine(3);
   lcd.setCursor(0,3);
   lcd.print(" Ready for Dispense ");
 }
 
 // BulkScreen()
 // Displayed during the dispense state when bulk dispensing
-void BulkScreen(float targetWeight)
+void BulkScreen(float targetWeight, float errorMargin)
 {
   // Print display lines 1 and 2
-  noErrorTopLines();
+  noErrorTopLines(errorMargin);
 
   // Print display line 3
   clearLine(2);
@@ -116,16 +140,17 @@ void BulkScreen(float targetWeight)
   lcd.print(targetWeight);
 
   // Print display line 4
+  clearLine(3);
   lcd.setCursor(0,3);
   lcd.print("  Rapid Dispensing  ");
 }
 
 // TrickleScreen()
 // Displayed during the dispense state when trickling
-void TrickleScreen(float targetWeight)
+void TrickleScreen(float targetWeight, float errorMargin)
 {
   // Print display lines 1 and 2
-  noErrorTopLines();
+  noErrorTopLines(errorMargin);
 
   // Print display line 3
   clearLine(2);
@@ -133,11 +158,12 @@ void TrickleScreen(float targetWeight)
   lcd.print(targetWeight);
 
   // Print display line 4
+  clearLine(3);
   lcd.setCursor(0,3);
   lcd.print("    Fine Trickle    ");
 }
 
-void GoodChargeScreen(float targetWeight, float finalWeight, int duration)
+void GoodChargeScreen(float targetWeight, float finalWeight, int duration, float errorMargin)
 {
   // Print the 2nd display line
   lcd.setCursor(0,1);
@@ -154,7 +180,7 @@ void GoodChargeScreen(float targetWeight, float finalWeight, int duration)
   lcd.print(duration);
 }
 
-void OverthrowScreen(float targetWeight, float finalWeight, int duration)
+void OverthrowScreen(float targetWeight, float finalWeight, int duration, float errorMargin)
 {
   // Print 2nd display line
   lcd.setCursor(0,1);
@@ -173,16 +199,19 @@ void OverthrowScreen(float targetWeight, float finalWeight, int duration)
 
 // noErrorTopLines()
 // Prints the top two lines for no-error screens (Brand + version info)
-void noErrorTopLines()
+void noErrorTopLines(float errorMargin)
 {
   lcd.setCursor(0,0);
   lcd.print(LINE1);
   
   lcd.setCursor(0,1);
-  lcd.print(LINE2);
+  lcd.print("V");
   lcd.print(VERSION_MAJOR);
   lcd.print(".");
   lcd.print(VERSION_MINOR);
+  lcd.print("  Error = ");
+  lcd.print(errorMargin);
+  lcd.print("gr");
 }
 
 void eraseTopLines()
