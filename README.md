@@ -79,7 +79,17 @@ The Printed Precision Trickler has been designed for quick and easy user assembl
 3. Insert the Powder Hopper into the top of the Bulk Hopper, where it will have a snug fit inside of the Hopper Gasket, until it reaches a hard stop and can be inserted no further
 4. Place the Powder Hopper Cap over the top of the Powder Hopper
 ### Scale Configuration
+Settings that require configuration and the configured values:
+- Cond = 0
+- 5Pd = 2
+- dout = 4
+- bP5 = 5
+- btPr = 2
+- Crlf = 1
+- tYPE = 4
+- Vnit = GN
 
+Detailed steps with ordered button presses for changing scale configuration settings coming soon
 ## Normal Usage
 
 ## Emptying After Use
