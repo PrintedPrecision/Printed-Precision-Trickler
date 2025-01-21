@@ -80,14 +80,14 @@ The Printed Precision Trickler has been designed for quick and easy user assembl
 4. Place the Powder Hopper Cap over the top of the Powder Hopper
 ### Scale Configuration
 Settings that require configuration and the configured values:
-- Cond = 0
-- 5Pd = 2
-- dout = 4
-- bP5 = 5
-- btPr = 2
-- Crlf = 1
-- tYPE = 4
-- Vnit = GN
+- bA5Fnc-Cond = 0
+- bA5Fnc-SPd = 2
+- dout-Prt = 4
+- SiF-bP5 = 5
+- SiF-btPr = 2
+- SiF-Crlf = 1
+- SiF-tYPE = 4
+- Unit = GN
 
 Detailed steps with ordered button presses for changing scale configuration settings coming soon
 ## Normal Usage
