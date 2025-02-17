@@ -19,16 +19,16 @@ Your Printed Precision Trickler will ship with the following list of parts. Modu
      - Bulk Cup
      - NEMA-17 Stepper Motor
    - Bulk Disk
-   - Bulk Hopper Sub-Module ***(User Assembly Required)***
-     - Bulk Hopper
+   - Bulk Funnel Sub-Module ***(User Assembly Required)***
+     - Bulk Funnel
      - Hopper Gasket (Pre-Assembled with Bulk Hopper)
      - Powder Hopper
      - Powder Hopper Cap
-6. Controls Module (Fully Pre-Assembled)
-   - Controls Housing Body
-   - Controls Housing Left Panel
-   - Controls Housing Right Panel
-   - Controls Housing PCB Stop
+6. Control Module (Fully Pre-Assembled)
+   - Control Housing Body
+   - Control Housing Left Panel
+   - Control Housing Right Panel
+   - Control Housing PCB Stop
    - Momentary Adjustment Button x2
    - Enable Toggle Button
    - Display
@@ -66,18 +66,25 @@ The Printed Precision Trickler has been designed for quick and easy user assembl
 ### Bulk Dispense Module
 1. Install the Bulk Disk using the same technique as installation of a trickler disk, first lining up the keyed motor shaft with the through-hole on the disk before pressing it into place using the center knob and your thumbs on opposite sides of the flat top surface
 2. Rotate the Bulk Cup until the larger opening in the sidewall is facing towards you
-3. Place the Bulk Hopper on top of the disk, with the hopper portion away from you and pointing up. The bar extending from the bottom of the hopper will protrude through the opening in the Bulk Cup side wall towards you at this point in time
-4. Line up the tab on the far side of the Bulk Hopper with the small hole in the far sidewall of the Bulk Cup, and press firmly to insert the tab into the hole
+3. Place the Bulk Funnel on top of the disk, with the hopper portion away from you and pointing up. The bar extending from the bottom of the hopper will protrude through the opening in the Bulk Cup side wall towards you at this point in time
+4. Line up the tab on the far side of the Bulk Funnel with the small hole in the far sidewall of the Bulk Cup, and press firmly to insert the tab into the hole
 5. Once the far tab has been inserted, keep forwards pressure while sliding the near-side tab to your right into the horizontal slot in the Bulk Cup sidewall
 6. Once both tabs have been inserted into their respective slots, pull the hopper back towards you slightly to ensure it is firmly pressed against the surface of the Bulk Cup's sidewall near the large opening
-7. If the red rubber Hopper Gasket is not positioned within the retaining groove at the top of the installed Bulk Hopper, replace it back into the top groove at this time
+7. If the red rubber Hopper Gasket is not positioned within the retaining groove at the top of the installed Bulk Funnel, replace it back into the top groove at this time
 ### Final Assembly
 1. With the Base Module in place on top of the scale, lower the Trickle Dispense Module into the left square opening of the Module Mount
    - NOTE: The Trickler Module has a hole in the bottom near the edge that kernels will drop through, this hole must face the center funnel of the Module Mount
 2. With the Base Module in place on top of the scale, lower the Bulk Dispense Module into the right square opening of the Module Mount
    - NOTE: The Bulk Dispense Module has a tighter fit than the Trickle Dispense Module due to the additional weight of a full powder hopper
-3. Insert the Powder Hopper into the top of the Bulk Hopper, where it will have a snug fit inside of the Hopper Gasket, until it reaches a hard stop and can be inserted no further
+3. Insert the Powder Hopper into the top of the Bulk Funnel, where it will have a snug fit inside of the Hopper Gasket, until it reaches a hard stop and can be inserted no further
 4. Place the Powder Hopper Cap over the top of the Powder Hopper
+### Plugging Everything In
+1. Plug the end of the Bulk cable into the motor of your Bulk Dispense Module
+   - The connector may only be inserted in one direction, with the alignment tabs facing up
+2. Plug the end of the Trickle cable into the motor of your Trickle Dispense Module
+3. Plug one end of the provided RS-232 cable into the matching port on the right side of your trickler Control Unit as well as the rear of your fx-series scale
+4. Plug the included power adapter into both the wall and the barrel jack on the right side of your trickler Control Unit
+   - ***CAUTION*** To avoid spilled powder from the startup calibration cycle, double-check that the enable toggle, the middle button on the control unit, is not depressed when plugging in the power cable for the first time
 ### Scale Configuration
 Settings that require configuration and the configured values:
 - bA5Fnc-Cond = 0
@@ -89,7 +96,105 @@ Settings that require configuration and the configured values:
 - SiF-tYPE = 4
 - Unit = GN
 
-Detailed steps with ordered button presses for changing scale configuration settings coming soon
+When programming your scale, you will use the following 4 buttons on the front face of the scale:
+- SAMPLE
+  - Press and hold for 2 seconds to enter the configuration menu
+  - Used to scroll between categories and individual settings
+- RE-ZERO/TARE
+  - Changes the currently displayed setting
+- PRINT
+  - Selects a currently-displayed category to view individual settings within that category
+  - Saves a currently-displayed individual setting
+- CAL
+  - Exits the configuration menu
+
+### Detailed Scale Programming Instructions
+For those who have a standard/unlocked fx-series scale, denoted by the presence of an orange "Re-Zero" key on the front panel of the scale, the following steps are all that is needed to program your scale for use with the Printed Precision Trickler. For those with an NTEP scale, denoted by model names ending with "N" and an orange "Tare" key on the front panel, you must first follow steps further below to unlock your scale so that the configuration may be altered.
+
+1. User action --> Display after action is completed
+
+The format of these instructions are as noted above, where the action you need to take is immediately followed by what you should see on the display once the action has been completed.
+
+1. Press and hold SAMPLE for 2 seconds --> bA5Fnc
+2. Press PRINT --> Cond
+3. Press RE-ZERO/TARE 2 times, or until 0 is displayed --> Cond 0
+4. Press SAMPLE 4 times --> 5Pd
+5. Press RE-ZERO/TARE 2 times, or until 2 is displayed --> 5Pd 2
+6. Press PRINT --> CP Fnc
+7. Press SAMPLE 3 times --> dout
+8. Press PRINT --> Prt
+9. Press RE-ZERO/TARE 4 times, or until 4 is displayed --> Prt 4
+10. Press PRINT --> 5iF
+11. Press PRINT --> bp5
+12. Press RE-ZERO/TARE 3 times, or until 5 is displayed --> bp5 5
+13. Press SAMPLE --> btPr
+14. Press RE-ZERO/TARE 2 times, or until 2 is displayed --> btPr 2 (8-N will display above btPr)
+15. Press SAMPLE --> CrLF
+16. Press RE-ZERO/TARE --> CrLF 1
+17. Press SAMPLE --> tyPE
+18. Press RE-ZERO/TARE 4 times, or until 4 is displayed --> tyPE 4 (NU will display above tyPE)
+19. Press PRINT --> Unit
+20. Press PRINT --> Unit g
+21. Press SAMPLE 10 times, or until GN appears --> Unit GN
+    - If GN does not appear as an option when cycling through all individual settings, exit the configuration menu by pressing CAL, turn the scale off, and proceed to the Konami Code Unit Selection instructions below
+22. Press RE-ZERO/TARE --> *Unit GN (A circle will appear to the left of Unit, indicating Grains has been selected as your default unit of measurement)
+23. Press PRINT --> id
+24. Press CAL --> Exits configuration menu
+
+Your scale should now be fully configured to operate with your Printed Precision Trickler!
+
+### Konami Code Unit Selection
+Unfortunately some scales will arrive without having Grains available to select as your unit of measure, which is usually the result of the scale being an NTEP model rather than a factory unlocked scale. This requires a more complicated method to enable Grains as an option before it may be selected in the standard configuration menu as described above.
+
+***IMPORTANT NOTE*** - Step 4 has a very short window of time in which it must be completed, so please make sure to read steps 3-5 in full prior to completing step 3 to avoid needing to restart the process
+
+1. Begin with your scale plugged in, but turned off --> Small arrow in the bottom left corner
+2. Read steps 3-5 to be sure you understand them prior to continuing
+3. Hold PRINT and RE-ZERO/TARE while turning the scale on --> The screen will light up
+4. ***While still holding RE-ZERO/TARE***, release the PRINT key and then rapidly press PRINT 2 times --> The screen will go empty
+5. Hold RE-ZERO/TARE and press PRINT --> Unit g
+   - If you don't see unit after pressing PRINT the first time, press PRINT a 2nd time because some scales (depending on exact factory configuration) will require 2 presses of it to proceed here
+6. Press SAMPLE until GN is displayed --> Unit GN
+7. Press RE-ZERO/TARE --> *Unit GN (A circle will appear to the left of Unit, indicating Grains has been enabled as a unit of measurement)
+8. ***OPTIONAL*** Press SAMPLE until g is displayed --> Unit g
+9. ***OPTIONAL*** Press RE-ZERO/TARE --> *Unit g (A circle will appear to the left of Unit, indicating Grams has been enabled as a unit of measurement)
+10. Press PRINT --> END will display, followed by another menu item (exact menu item depends on the individual scale)
+11. Press ON:OFF to turn the scale off, proceed to the Detailed Scale Programming Instructions above
+
+### NTEP Scale Unlocking
+For people with NTEP scales, denoting by model names ending with "N" and an orange "Tare" key on the front panel instead of the orange "RE-ZERO" key that unlocked models have, the following steps must be taken BEFORE you can properly configure your scale to work with the Printed Precision Trickler.
+
+NOTE: Your NTEP scale may also have arrived to you with a metal plate attached to the back of the outer housing, directly underneath the RS-232 port. To be able to press the "Internal Cal" button in these instructions you must first remove this plate as it covers the opening through which that button is accessed.
+
+***Internal Cal*** -- This button is located within the outer housing of the scale, accessed by reaching through the hole below the RS-232 port in the back of the housing. It is along the rear edge of the scale housing at the very top, and can usually be felt simply by inserting a finger into the opening and bending your knuckle until you feel the circuit board mounted to the top of the housing.
+
+1. Begin with your scale plugged in, but turned off --> Small arrow in the bottom left corner
+2. Press and hold both Internal Cal and CAL buttons while turning the scale on --> The entire display will light up at once (you can release the Internal Cal and CAL buttons once you see this)
+3. Hold SAMPLE and press PRINT 2 times --> APr
+   - If you see something other than APr, press SAMPLE until APr is displayed
+   - If APr is not available when cycling through all menu options with the SAMPLE key, turn the scale off and follow Advanced NTEP Unlock instructions further below
+4. Press PRINT --> APr
+5. Press TARE until 0 is displayed --> APr 0 (STD will display above APr)
+6. Press PRINT --> End will display
+7. Press ON:OFF to turn the scale off, proceed to the Konami Code Unit Selection instructions above
+
+### Advanced NTEP Unlock
+Due to the large number of possible configurations for an fx-series scale from the factory, you may find yourself unfortunately stymied when trying to locate the APr menu to unlock your NTEP scale. Don't worry, this doesn't mean your scale is broken or unusable! It simply means your scale's default configuration is slightly different from most NTEP scales and requires an extra step to enable the APr menu from the NTEP Scale Unlocking instructions.
+
+1. Begin with your scale plugged in, but turned off --> Small arrow in the bottom left corner
+2. Press and hold both Internal Cal and CAL buttons while turning the scale on --> The entire display will light up at once (you can release the Internal Cal and CAL buttons once you see this)
+3. Hold TARE and press PRINT --> Unit
+4. Press SAMPLE until Ld is displayed --> Ld
+5. Press PRINT --> Ld # (# will be some number, it varies from scale to scale)
+6. Press TARE until 0 is displayed --> Ld 0
+7. Press PRINT --> End will display, followed by another menu item (exact menu item depends on the individual scale)
+   - If Ani is displayed, skip step 8
+8. Press SAMPLE until Ani is displayed --> Ani
+9. Press PRINT --> Ani # (# will be some number, it varies from scale to scale)
+10. Press TARE until 0 is displayed --> Ani 0
+11. Press PRINT --> End will display, followed by another menu item
+12. Press ON:OFF to turn the scale off, proceed to the NTEP Scale Unlocking instructions above
+
 ## Normal Usage
 
 ## Emptying After Use
