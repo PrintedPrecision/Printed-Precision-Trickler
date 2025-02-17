@@ -206,6 +206,16 @@ Due to the Printed Precision Trickler's innovative design that instead carries k
 
 Most fast to moderate burn rate powders will utilize the disk marked "Varget", optimized for powders with kernel diameters of 0.7-1.0mm (0.026-0.039"). The "Retubbo" disk was created for use with larger diameter powders, such as those commonly used in magnum rifle cartridges, with kernel diameters of 1.1mm or greater.
 
+### Powder Fill Levels
+The Trickler Cup in your Printed Precision Trickler should not be overfilled. A good starting point is to place approximately 50-75 grains of powder in the trickler cup and occasionally add to that quantity whenever you observe the pile of extra powder at the low end of the cup running low. 
+While the Trickler Cup can hold more than 75gr of powder at time, 75gr is a safe starting point as the exact maximum depends on the specific powder in use. The Trickler Cup is overfilled when the pile of powder from the low end of the cup travels all the way around the disk and begins to spill over the top edge of the disk through the opening in the cup. This is easily recognized by the excessively high calibrated kernel weights and more frequent overthrows this condition can cause.
+
+The Bulk Hopper may be filled as full as you like, or left as empty as you please so long as there is enough powder to at least fill the very bottom of the Bulk Funnel. You may use the Printed Precision Trickler with replacement hoppers that fit within the Bulk Funnel or even with no hopper at all if you so desire.
+
+### Emptying After User
+The Bulk Hopper is emptied by first lifting the entire Bulk Dispense Module straight up, removing it from the mount it sits in, and then angling the assembly towards the opening in the cup wall that it dispenses through in normal operation. The powder will flow across the disk and out the opening into whatever recepticle you aim the opening towards. 
+
+The Trickler Cup may be emptied in two different ways, but both similarly begin by removing the Trickle Dispense Module from the mount it sits in. You can then either tip the module towards the taller rim of the cup and pour the powder out the top, or you may tip the module towards the lower rim of the cup and pour the powder out the bottom of the cup as it bypasses the trickler disk. In either case, after you have poured all of the loose powder from the Trickler Cup it is recommended to manually rotate the disk (with a container underneath the hole it dispenses from in normal operation) to remove any kernels that may still remain in the slots of the disk.
 
 ### Indicator Lights
 The three lights across the top of your Control Unit will give you important information about the current status of the Printed Precision Trickler. 
@@ -284,9 +294,24 @@ If the scale reading instead decreases to below the target value after the initi
 
 Once you lift the cup off the weighing plate it will automatically return the trickler to the Ready state, awaiting the placement of an empty cup to begin dispensing the next charge all over again. 
 
-## Emptying After Use
-
 ## Troubleshooting
+Tips and tricks for optimal operation
+
+### Static Electricity
+The main problem encountered by users of the Printed Precision Trickler is that of static electricity. This can cause kernels of powder to cling to the hopper, the disks, the cups containing the disks, or the funnel integrated into the mounts on top of the draft shield. If kernels cling to these parts it can reduce the precision of dispensed charges since the trickler can no longer fully control the number of kernels that are dispensed into the powder cup. Take care to avoid static in your reloading area by touching something metallic to discharge yourself prior to handling or using the Printed Precision Trickler if your home or shop is prone to static electricity. 
+
+When your trickler is brand new, the parts may have a static charge that accumulated during shipping and transport. The most effective and convenient method of removing any charge that may accumulate in transit, as well as preventing future static cling, is with the application of a dry graphite lubricant available in a spray application. You may also apply a small amount of graphite powder at any time to parts of the trickler using a brush or your finger as a highly-effective means of removing static charge and preventing future accumulation, though this can be much messier than the spray application and is best performed outdoors. Another highly convenient alternative is to rub all of the parts (except for the interior of the powder cup) with a dryer sheet, new or used. 
+
+While the friction surfaces of your trickler have been treated at the time of manufacturing to help prevent accumulation of static charge in normal operation, you may notice some amount of static cling during the first few loading sessions using it - particularly operating in arid environments. If you notice static cling during normal operation, feel free to re-apply graphite spray/powder or the dryer sheet treatment though this should resolve itself soon after you begin using your trickler. As you use your Printed Precision Trickler small amounts of the graphite used to coat the kernels of gunpowder will rub off onto the parts of the trickler that come into contact with powder. This may cause some discoloration of parts, but it is not harmfull and serves the same beneficial purposes as the initial surface treatment during manufacturing and any post-purchase application of graphite or dryer sheets. 
+
+Static electricity can also interfere with the ability of your fx-series scale to accurately and realibly measure the load on the weighing plate. If you notice unusually large drift in your scale readings or zero of 0.1gr or more within a timeframe of less than an hour, the most likely culprit is an accumulated static charge on some part of your trickler. The largest effect can be observed in this fashion if the base/draft shield or weighing plate has accumulated a charge. While these parts, like the friction surface, are treated during manufacturing to help prevent the accumulation of static charge this is always a good first step to troubleshoot scale drift prior to investing in expensive power conditioners under the assumption it is caused by a "dirty" input power from the wall. 
+
+### Scale Drift
+As mentioned above, the most likely culprit of unusually large drift in your scale readings/zero is an accumulated static charge near the sensitive electronics of the scale. Smaller amounts of drift and scale readings that appear bouncy or jittery usually have different root causes, however.
+
+It is recommended to not utilize flourescent lighting in your loading area as it can both remotely affect the operation of your fx-series scale and lead to a "dirtier" power supply if the lights are powered on the same circuit as your scale. This is a common culprit behind smaller quantities (<0.1gr) of drift in your scale readings.
+
+Similarly it is recommended that you attempt to isolate your scale from both vibration and air drafts during normal operation. This is the most common cause of scale readings that appear bouncy or jittery. The draft shield integrated into the Printed Precision Trickler, combined with the smaller surface area of the provided weighing plate, give an improved level of resilience against air drafts but you should still place it somewhere away from the path of airflow from HVAC vents, open windows/doors, or heavy foot traffic. For vibration isolations a sturdy surface to place the scale upon is a must, and ideally this surface would not be the same as the one your reloading press is mounted to. Since this isn't always practically feasible, another highly effective method of isolating the scale from other activity on your solid work surface is to place it upon a granite surface plate heavy concrete paver. This can be combined with vibration-dampening feet for optimal isolation performance, though simply sitting on the heavy mass without additional dampers can also go a long way in reducing the impact of vibrations on your scale readings.
 
 ## Software Updates
 To update the software on your Printed Precision Trickler, you will need the following items:
