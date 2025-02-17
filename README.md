@@ -84,7 +84,9 @@ The Printed Precision Trickler has been designed for quick and easy user assembl
 2. Plug the end of the Trickle cable into the motor of your Trickle Dispense Module
 3. Plug one end of the provided RS-232 cable into the matching port on the right side of your trickler Control Unit as well as the rear of your fx-series scale
 4. Plug the included power adapter into both the wall and the barrel jack on the right side of your trickler Control Unit
-   - ***CAUTION*** To avoid spilled powder from the startup calibration cycle, double-check that the enable toggle, the middle button on the control unit, is not depressed when plugging in the power cable for the first time
+   - ***CAUTION*** To avoid spilled powder from the startup calibration cycle, ensure that a cup is placed on the weighing plate PRIOR to powering the Printed Precision Trickler
+5. Plug the power adapter into both the wall and the scale, only after first ensuring that a cup is been placed on the weighing plate
+   - It is ***STRONGLY RECOMENDED*** that you have a cup sitting on the weighing plate when power is first provided to the scale, as this helps to prevent powder from being dispensed without a cup present to collect it during normal operation
 ## Scale Configuration
 Settings that require configuration and the configured values:
 - bA5Fnc-Cond = 0
@@ -211,24 +213,68 @@ When the middle switch is disabled, you may use the left button to decrease the 
 If you ever notice unusual behavior the left and right buttons can also be used to request recalibration of the Bulk and Trickle dispensers. Simply press and hold both left and right buttons at the same time for at least 1 second and the trickler will go into Calibration mode.
 
 ### Display
-While the indicator lights are handy for information at a glance while dispensing, the display on the front of the Control Unit will provide you with additional details about the configuration and current status of the Printed Precision Trickler. Throughout use this display will show you one of 5 distinct modes.
+While the indicator lights are handy for information at a glance while dispensing, the display on the front of the Control Unit will provide you with additional details about the configuration and current status of the Printed Precision Trickler. Throughout use this display will show you one of 5 distinct states:
 
 #### Initialization
 When you first plug the power adapter into the Control Unit it will perform initialization and attempt to establish a connection with your scale. The scale must be powered by its own separate power adapter for this, but it doesn't have to be turned on yet. The display will notify you during this time if a scale connection cannot be established.
 
 #### Calibration
 After a connection is established, the trickler will proceed to initial calibration and you will be prompted by the display to press the enable toggle to begin. Make sure you have powder in the bulk hopper/trickler cup when doing this, as well as an empty cup in place to catch dispensed kernels! It will run both the bulk and trickler motors to measure how fast the Bulk Module is dispensing and the kernel weight of your currently-loaded powder.
-This is the same mode you will enter if you press and hold the left and right buttons to re-calibrate the unit.
+This is the same state you will enter if you press and hold the left and right buttons to re-calibrate the unit.
 
-At the end of the calibration process the display will show your current calibrated kernel weight, as well as the acceptable error margin for dispensed charges. This error margin is automatically calculated based on the measured kernel weight to ensure that any time you see a green light your dispensed charge is accurate to within a single kernel of the targeted charge weight.
+At the end of the calibration process the display will show your current calibrated kernel weight, as well as the acceptable error margin for dispensed charges. You should dump the powder dispensed into the cup during calibration back into the bulk hopper and/or the trickler cup at this time, and the display will prompt you to release/disable the middle toggle switch to proceed.
+
+This error margin is automatically calculated based on the measured kernel weight to ensure that any time you see a green light your dispensed charge is accurate to within a single kernel of the targeted charge weight.
 For example, if you have a kernel weight of ~0.021gr (common for powders with moderate burn-rate such as Varget or H4350) the acceptable error margin will be 0.02gr because single kernel accuracy will always give you either your exact targeted charge weight or 0.02gr over depending on the exact weight of the last individual kernel and how the scale's rounding accumulates across multiple dispensed kernels. 
 This is because 9 kernels each weighing exactly 0.021gr (actual weight - 0.189gr) would register as a weight of 0.18gr on an fx-series scale, while 10 of the same 0.021gr kernels (actual weight - 0.210gr) would be rounded up to 0.22 grains by the scale.
 
 For larger powders, such as Retumbo or N570, the weight of each kernel may exceed 0.04gr which would lead to the acceptable error margin being set to 0.04gr instead. This maintains the same single-kernel level of precision as the 0.02gr error example above, just with increased weight for that single kernel. 
 The Printed Precision Trickler supports a maximum acceptable error margin of 0.06gr, though this should be extremely rare as you would be hard pressed to find a powder with kernels that each weigh more than 0.06gr on average.
 
-#### 
-Once calibration has finished, you'll find yourself in the Ready display. This means the trickler is ready for you to place an empty cup on the weighing plate to begin dispensing charges. After the initial calibration you can simply dump the dispensed powder back into the hopper and you'll be off to the races! The display will tell you both the current 
+#### Idle
+Once calibration has finished and the middle toggle button is released/disabled, you'll find yourself in the Idle state. This is where you can adjust the targeted charge weight with the left/right buttons or press and hold both buttons to request re-calibration of the system.
+The display will show you your current target weight and acceptable error margin as well as the current software version.
+
+The idle state may also be reached at any time by releasing/disabling the middle toggle button. Returning to the idle state in this fashion will immediately halt both the bulk and trickle motors, allowing it to serve double-duty as a panic button in case a misplaced cup is spilling kernels or for any other reason.
+
+#### Ready
+When the middle toggle switch has been depressed/enabled from the Idle state, you will enter the Ready state. At this point the system will be ready for you to place an empty cup on the weighing plate so that it may begin dispensing charges. 
+
+When placing an empty cup on the weighing plate, be sure to slide it into the center until it hits the weighing plate's retaining ring and stops. This will ensure that your powder cup is always placed in the same spot, centered within the weighing plate, to avoid potential error in the accuracy of dispensed charges.
+
+***NOTE*** Do not depress/enable the middle toggle switch without a cup on the weighing plate. If the scale reads a weight of less than 1gr away from the scale's zero value without the cup in place the system may dispense powder without a means of containing it, with will spill out within the draft shield and onto your loading bench. 
+This problematic condition can also be avoided by following the assembly steps above to ensure that a cup is sitting on the weighing plate when you first plug in the scale's power adapter, as this will cause the empty weighing plate to read a weight of -E which prohibits powder from being dispensed
+
+If your scale does not read zero when you place an empty cup on the weighing plate, don't worry! This can happen for a variety of reasons, but is most commonly due to not having the cup on the weighing plate when the scale was first turned on or from the scale last being zeroed with some powder still inside of the weighing cup. Simply place the empty cup you wish to use on the weighing plate and press the orange RE-ZERO/TARE key to begin dispensing powder.
+
+#### Dispense
+Once the scale reads a weight of +/- 1gr, to account for slight amounts of scale zero drift that occur during extended breaks between loading sessions if the scale is left on, the Printed Precision Trickler will begin dispensing your targeted powder charge in a two-stage operation. 
+When the trickler begins to dispense the yellow light on top will illuminate to indicate that a charge is currently in-progress, and the display will update to indicate whether it is currently utilizing the Bulk Dispense Module or Trickle Dispense Module.
+
+It will first re-zero the scale. This gives you the flexibility to use two different powder cups with very similar but not quite identical weights without issue. It also combats the potential for scale drift over long loading sessions to affect the accuracy of dispensed charges.
+
+Then the Bulk Dispense Module will rapidly measure out the majority of the charge. The first pulse of the Bulk Module will attempt to dispense roughly 95% of the target weight, and if more than 1gr remains to dispense after the first pulse a second smaller pulse from the Bulk Module will serve to further close the gap to the target weight.
+
+After these two Bulk Module operations, or if the current weight is within 1gr of the target after the first pulse, the Printed Precision Trickler will switch to instead utilize the Trickle Dispense Module. The precise nubmer of kernels to dispense will be calculated based on the calibrated weight of a single kernel and then rapidly dispensed.
+If lighter than average kernels were dispensed in this first trickle operation the process of calculation and dispensing will repeat until the target weight has been achieved. 
+
+The Printed Precision Trickler software will also continuously refine the calibration variables for both the Bulk Dispense Module and Trickle Dispense Module throughout your loading session to ensure optimal speed and precision. 
+The main bulk pulse and secondary bulk pulse each have their own calibration factor that will be adjusted if dispensed totals do not fall within the expected range, serving to fine-tune the results of the initial calibration process. The calibrated kernel weight will also be refined based on the performance of the first trickle operation to reduce or eliminate the need for additional trickle operations in the future.
+Optimal accuracy of these calibration variables should be reached within 10-20 dispensed charges with a noticeable effect on the time required to dispense each charge, but successful dispenses will have single kernel accuracy from the very first charge thrown.
+
+#### Evaluate
+After the measured charge weight has reached or exceeded the target weight, the Printed Precision Trickler will advance to the Evaluate state. The display will show the target weight, dispensed weight, acceptable error margin, and the time spent dispensing the last charge (in milliseconds).
+
+If the charge is accurate to within the acceptable error margin, the green light will illuminate to indicate a successful charge accurate to within a single kernel. This allows you to determine at a glance if a dispensed charge is known to be accurate within a single kernel.
+
+If the charge has exceeded the acceptable error margin, the red light will illuminate and the display with give an overthrow warning. If you are satisfied with the accuracy of the charge (a charge dispensed to 0.04gr over target when the acceptable error margin was set to 0.02gr, for example) you may elect to still use it, but if you wish to maintain single kernel accuracy it is recommended that you dump the overweight dispensed charge back into either the Bulk Hopper or Trickler Cup.
+
+If initial evaluation determines that a charge was dispensed successfully, the Printed Precision Trickler will continue to monitor the scale reading to ensure that it does not observe a change in the reported charge weight prior to the powder cup being removed from the weighing plate. If the scale reading increases and exceeds the acceptable error margin, due to a longer than expected settling time for example, the trickler will immediately notify you by turning off the 
+green light and instead providing the red indicator light with an overthrow warning display. 
+
+If the scale reading instead decreases to below the target value after the initial evaluation, the green light will be exchanged for a yellow indicator light and the trickler will provide you with the option to manually add one kernel at a time if you so desire. This can be helpful if vibration or air drafts lead to a scale reading that is slightly higher than the actual amount of powder in the cup, allowing you to quickly add the final kernel or two to correct for this environmental disturbance during the dispense.
+
+Once you lift the cup off the weighing plate it will automatically return the trickler to the Ready state, awaiting the placement of an empty cup to begin dispensing the next charge all over again. 
 
 ## Emptying After Use
 
