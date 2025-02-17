@@ -97,4 +97,57 @@ Detailed steps with ordered button presses for changing scale configuration sett
 ## Troubleshooting
 
 ## Software Updates
-Insert instruction manual here
+To update the software on your Printed Precision Trickler, you will need the following items:
+- Windows, MacOS, or Linux computer
+- MicroUSB cable
+
+The steps below will be provided from the perspective of a user with a computer running the Windows operating system, but the steps are largely similar across all operating systems.
+
+### Install Arduino IDE and the Arduino AVR Board Package
+Those who have used an Arduino before in the past may already have these steps completed, but for those new to Arduinos here are the steps to follow on a Windows computer:
+1. Download and install the Arduino IDE from the Arduino website here: https://www.arduino.cc/en/software
+   - You may select whatever options you like during the installation procedure, it will not affect your ability to update the software on your trickler
+2. Launch the newly-installed program
+3. In the far-left column of the Arduino IDE, select the icon that is 2nd from the top named "Board Manager"
+4. Search for or scroll to locate the "Arduino AVR Boards" item in the list of options, and click "INSTALL"
+   - You may see a prompt requesting permission to make changes, this is to install the drivers that will allow your computer to communicate with the Arduino Nano
+
+### Download, Extract, and Open the Latest Printed Precision Trickler Software Release
+1. On the GitHub page where this user manual is located (https://github.com/PrintedPrecision/Printed-Precision-Trickler), click the "Releases" text on the right-hand side of the screen to show all software releases
+   - Alternatively, you may click the release tag name immediately below the "Releases" text to navigate directly to the latest release
+2. Locate the software release version you wish to install and click one of the options below the description to download a compressed archive of the source code for that software release
+   - For those using Windows PC's, the zip version is highly recommended
+3. Open the file explorer and navigate to your downloads folder where the compressed archive is saved
+4. Extract the source code from the compressed archive
+   - Note that the location you extract the files to is unimportant
+5. Once the compressed archive has finished extracting, navigate into the folders until you see a list of 10 files - inclduding this User Manual!
+6. In the folder where all 10 files are visible, create a new folder named "PrintedPrecisionTrickler"
+   - Arduino IDE requires that the main project file (the one with the .ino file extension) be located within a folder of the same name as the project file
+7. Drag and drop all 10 of the files into your newly created folder, before entering this folder to once again view the full list of 10 files
+8. Double-click the file named "PrintedPrecisionTrickler.ino" to open the project file in your installed Arduino IDE
+
+### Install the Additional Libraries
+1. In the far-left column of the Arduino IDE, select the icon that is 3rd from the top named "Library Manager"
+2. Type "MobaTools" into the search bar and locate the library of the same name in the list of results published by "MicroBahner" - click "INSTALL"
+   - This is the library to control the stepper motors, with the latest version being 2.6.2 at the time of this writing
+   - You will notice that the description for this library is written in German, but don't worry! You will not need to know any foreign languages to complete your software update.
+3. Type "hd44780" into the search bar and locate the library of the same name in the list of results published by "Bill Perry" - click "INSTALL"
+   - This is the library to control the display, with the latest version being 1.3.2 at the time of this writing
+
+### Connect Your Trickler and Update the Software
+Now that all of our preparations are complete, we are finally ready to update the software on your Printed Precision Trickler!
+1. Disconnect your Printed Precision Trickler from both your scale and the power supply that was included with your trickler
+2. Plug one end of your MicroUSB cable to an available USB port on your computer
+3. Plug the other end of your MicroUSB cable into the port located within the opening on the left side panel of your trickler control unit
+   - Note that this only plugs in one direction! The widest edge of the MicroUSB's trapezoidal shape should face up.
+   - Your computer may prompt you for permission to install a device driver at this point, click to allow this driver to be installed if this happens for you
+4. In the top left corner of the Arduino IDE you will see a drop down selection menu, click on this and then click on the option named "Arduino Nano Every"
+   - Underneath the "Arduino Nano Every" descripter will be a "COM5" or similar phrase, this is normal and just indicates the name of the port your Arduino is plugged into and is not important (it will be different for different computers)
+5. Locate the Upload button to the left of this drop-down menu
+   - It looks like an arrow pointing sideways, and is the 2nd icon from the left in the top tray that also contains the Verify button (a checkmark) and the Arduino selection drop-down menu
+6. Click the Upload button to update the software of your trickler
+   - This process will take approximately 10-15 seconds
+   - You will see a progress menu in the bottom right corner - ***DO NOT UNPLUG THE MICRO USB CABLE UNTIL AFTER IT CHANGES TO SAY "DONE UPLOADING"***
+   - You will likely see red error text pop up in the "Output" window on the lower half of the screen, this is expected and does not cause any issues (you can read more about this on the [Arduino support website](https://support.arduino.cc/hc/en-us/articles/4405239282578-If-you-see-a-jtagmkII-initialize-Cannot-locate-flash-and-boot-memories-in-description-message-when-uploading-to-Nano-Every) if you would like)
+
+At this point the software on your Printed Precision Trickler has been updated! You may confirm that your trickler software has been updated by making sure that the version number displayed on the screen is the same as the release version that you downloaded, and you may freely disconnect the MicroUSB cable at this time.
