@@ -199,6 +199,14 @@ Due to the large number of possible configurations for an fx-series scale from t
 
 ## Operating Instructions
 The Printed Precision Trickler has been designed to allow anyone to quickly and easily dispense accurate powder charges without needing to download and pair a companion app or navigate complex menus for configuration. To achieve this goal, your trickler's Control Unit has the following important items:
+
+### Trickler Disk Selection
+The selection of which disk to use in your Printed Precision Trickler is an important one, but fortunately it's also easy to make. Past examples of disk tricklers transported kernels laying down on their side, making the proper fitment sensitive to both kernel length and kernel diameter. 
+Due to the Printed Precision Trickler's innovative design that instead carries kernels upright on end within the slots of a disk, the only factor in determining the proper disk for your powder in this system is the extrusion diameter of the kernels.
+
+Most fast to moderate burn rate powders will utilize the disk marked "Varget", optimized for powders with kernel diameters of 0.7-1.0mm (0.026-0.039"). The "Retubbo" disk was created for use with larger diameter powders, such as those commonly used in magnum rifle cartridges, with kernel diameters of 1.1mm or greater.
+
+
 ### Indicator Lights
 The three lights across the top of your Control Unit will give you important information about the current status of the Printed Precision Trickler. 
 
