@@ -24,7 +24,7 @@ Your Printed Precision Trickler will ship with the following list of parts. Modu
      - Hopper Gasket (Pre-Assembled with Bulk Hopper)
      - Powder Hopper
      - Powder Hopper Cap
-6. Control Module (Fully Pre-Assembled)
+6. Control Unit (Fully Pre-Assembled)
    - Control Housing Body
    - Control Housing Left Panel
    - Control Housing Right Panel
@@ -85,7 +85,7 @@ The Printed Precision Trickler has been designed for quick and easy user assembl
 3. Plug one end of the provided RS-232 cable into the matching port on the right side of your trickler Control Unit as well as the rear of your fx-series scale
 4. Plug the included power adapter into both the wall and the barrel jack on the right side of your trickler Control Unit
    - ***CAUTION*** To avoid spilled powder from the startup calibration cycle, double-check that the enable toggle, the middle button on the control unit, is not depressed when plugging in the power cable for the first time
-### Scale Configuration
+## Scale Configuration
 Settings that require configuration and the configured values:
 - bA5Fnc-Cond = 0
 - bA5Fnc-SPd = 2
@@ -195,7 +195,40 @@ Due to the large number of possible configurations for an fx-series scale from t
 11. Press PRINT --> End will display, followed by another menu item
 12. Press ON:OFF to turn the scale off, proceed to the NTEP Scale Unlocking instructions above
 
-## Normal Usage
+## Operating Instructions
+The Printed Precision Trickler has been designed to allow anyone to quickly and easily dispense accurate powder charges without needing to download and pair a companion app or navigate complex menus for configuration. To achieve this goal, your trickler's Control Unit has the following important items:
+### Indicator Lights
+The three lights across the top of your Control Unit will give you important information about the current status of the Printed Precision Trickler. 
+
+The red light on the left is used to indicate that the dispensed charge is outside the acceptable error range (more on that in a moment), or that there was some error in calibration. This is the most important light of the three, because when it is lit you should check the display to see what is wrong
+The yellow light in the middle is used to indicate that a charge has not yet finished dispensing, or it is used after a charge is dispensed if the reading from the scale has changed to be lower than the targeted charge weight. When illuminated after a charge finished dispensing you have the option to either discard the charge and start fresh if you are concerned with the possibility of scale drift, or you may manually dispense additional kernels one at a time to reach the targeted charge weight.
+The green light on the right is used to indicate that calibration was successful or that a charge was dispensed within the acceptable error range. This is the light you'll see most often and it tells you that your charge has been accurately dispensed to within the weight of a single kernel.
+
+### Front Panel Buttons
+The Control Unit has 3 different buttons on its front panel, directly underneath the display. The ones on the left and right are standard buttons that release when you stop pushing them, but the middle item is a toggle switch that serves to enable and disable the dispensing of powder during use. 
+The middle switch will depress slightly and light up with a blue ring around the center button when it is enabled, and the light will turn off when it is released and disabled. While this middle switch is enabled, the left and right buttons won't change anything to prevent any accidental adjustments in the middle of a loading session.
+When the middle switch is disabled, you may use the left button to decrease the targeted charge weight or the right button to increase the target weight. Pressing and holding either button will continuously increment/decrement the target weight, and the longer you hold the faster it will adjust. It starts out as 0.02gr increments, stepping up to 0.1gr and later full 1gr increments to make even large adjustments in target weight fast and easy.
+If you ever notice unusual behavior the left and right buttons can also be used to request recalibration of the Bulk and Trickle dispensers. Simply press and hold both left and right buttons at the same time for at least 1 second and the trickler will go into Calibration mode.
+
+### Display
+While the indicator lights are handy for information at a glance while dispensing, the display on the front of the Control Unit will provide you with additional details about the configuration and current status of the Printed Precision Trickler. Throughout use this display will show you one of 5 distinct modes.
+
+#### Initialization
+When you first plug the power adapter into the Control Unit it will perform initialization and attempt to establish a connection with your scale. The scale must be powered by its own separate power adapter for this, but it doesn't have to be turned on yet. The display will notify you during this time if a scale connection cannot be established.
+
+#### Calibration
+After a connection is established, the trickler will proceed to initial calibration and you will be prompted by the display to press the enable toggle to begin. Make sure you have powder in the bulk hopper/trickler cup when doing this, as well as an empty cup in place to catch dispensed kernels! It will run both the bulk and trickler motors to measure how fast the Bulk Module is dispensing and the kernel weight of your currently-loaded powder.
+This is the same mode you will enter if you press and hold the left and right buttons to re-calibrate the unit.
+
+At the end of the calibration process the display will show your current calibrated kernel weight, as well as the acceptable error margin for dispensed charges. This error margin is automatically calculated based on the measured kernel weight to ensure that any time you see a green light your dispensed charge is accurate to within a single kernel of the targeted charge weight.
+For example, if you have a kernel weight of ~0.021gr (common for powders with moderate burn-rate such as Varget or H4350) the acceptable error margin will be 0.02gr because single kernel accuracy will always give you either your exact targeted charge weight or 0.02gr over depending on the exact weight of the last individual kernel and how the scale's rounding accumulates across multiple dispensed kernels. 
+This is because 9 kernels each weighing exactly 0.021gr (actual weight - 0.189gr) would register as a weight of 0.18gr on an fx-series scale, while 10 of the same 0.021gr kernels (actual weight - 0.210gr) would be rounded up to 0.22 grains by the scale.
+
+For larger powders, such as Retumbo or N570, the weight of each kernel may exceed 0.04gr which would lead to the acceptable error margin being set to 0.04gr instead. This maintains the same single-kernel level of precision as the 0.02gr error example above, just with increased weight for that single kernel. 
+The Printed Precision Trickler supports a maximum acceptable error margin of 0.06gr, though this should be extremely rare as you would be hard pressed to find a powder with kernels that each weigh more than 0.06gr on average.
+
+#### 
+Once calibration has finished, you'll find yourself in the Ready display. This means the trickler is ready for you to place an empty cup on the weighing plate to begin dispensing charges. After the initial calibration you can simply dump the dispensed powder back into the hopper and you'll be off to the races! The display will tell you both the current 
 
 ## Emptying After Use
 
