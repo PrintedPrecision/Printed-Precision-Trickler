@@ -2,7 +2,7 @@
 
 ## Parts Included
 Your Printed Precision Trickler will ship with the following list of parts. Modules requiring user-assembly are indicated below in bold italics.
-1. Base Module ***(User Assembly Required)***
+1. Base Module ***(User Assembly MAy Be Required)***
    - Stand With Integrated Windbreak
    - Trickle/Bulk Module Mount
 2. Scale Tray (Fully Pre-Assembled)
@@ -42,7 +42,10 @@ Your Printed Precision Trickler will ship with the following list of parts. Modu
 8. RS-232 Cable
 9. Glass Powder Cup 
 ## Assembly, Installation, and Scale Configuration
-The Printed Precision Trickler has been designed for quick and easy user assembly, with the complete first-time setup taking 5 minutes or less for most users. No module require the use of tools for assembly, but a small amount of super glue or a similar cyanoacrylate glue is recommended for the Base Module.
+The Printed Precision Trickler has been designed for quick and easy user assembly, with the complete first-time setup taking 5 minutes or less for most users. No module requires the use of tools for assembly, but a small amount of super glue or a similar cyanoacrylate glue is recommended to attach the Module Mount to the Base if it has not already been affixed.
+
+***NOTE*** While the parts of your trickler have been treated during manufacturing to help prevent future static cling it is recommended to use either a dry graphite lubricating spray, dryer sheets, or graphite powder (generally much messier than the other two options) to help remove any static charge that may have accumulated during shipping. A light application of graphite, in spray or powder form, or a thorough rubbing with dryer sheets should be effective in eliminating any static cling you may observe when first assembling and using your Printed Precision Trickler.
+
 ### Scale Tray Installation
 1. Remove the factory scale weighing tray from your A&D balance, or whatever other weighing tray may currently be installed, and ensure the top of the scale is free of any loose powder kernels or other debris
 2. Place the Printed Precision Trickler's Scale Tray into the hole in the center on top of the A&D balance
