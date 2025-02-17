@@ -19,6 +19,7 @@
 
 // External libraries
 #include <Arduino.h> // Standard Arduino libraries
+#include <EEPROM.h> // Arduino EEPROM libraries
 
 // Internal libraries
 #include "Display.h" // LCD controls
@@ -41,6 +42,8 @@
 #define GREEN_LED 14
 #define YELLOW_LED 15
 #define RED_LED 16
+
+#define MEMORY_ADDR 0
 
 // Error tracker values
 // 0 = No error
@@ -75,6 +78,7 @@ void decreaseBulkCalibration();
 void increaseTrickleCalibration();
 void smallIncreaseTrickleCalibration();
 void decreaseTrickleCalibration();
+void smallDecreaseTrickleCalibration();
 
 
 #endif // STATES_H

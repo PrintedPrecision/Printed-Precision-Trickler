@@ -17,7 +17,7 @@
 
 // Current software version
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 6
+#define VERSION_MINOR 7
 // Display constants
 #define LCD_COLS 20
 #define LCD_ROWS 4
@@ -37,6 +37,7 @@ void TrickleScreen(float targetWeight, float errorMargin);
 
 void GoodChargeScreen(float targetWeight, float finalWeight, int duration, float errorMargin);
 void OverthrowScreen(float targetWeight, float finalWeight, int duration, float errorMargin);
+void StaleChargeScreen(float targetWeight, float finalWeight, int duration, float errorMargin);
 
 void noErrorTopLines(float errorMargin);
 void eraseTopLines();

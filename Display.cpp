@@ -197,6 +197,23 @@ void OverthrowScreen(float targetWeight, float finalWeight, int duration, float 
   lcd.print(duration);
 }
 
+void StaleChargeScreen(float targetWeight, float finalWeight, int duration, float errorMargin)
+{
+  // Print 2nd display line
+  lcd.setCursor(0,1);
+  lcd.print("  CHANGE DETECTED!  ");
+
+  // Clear and print 3rd display line
+  clearLine(2);
+  lcd.print("  Dispensed = ");
+  lcd.print(finalWeight);
+
+  // Clear and then print the 4th display line
+  clearLine(3);
+  lcd.print("Push ^ To Add Kernel");
+  lcd.print(duration);
+}
+
 // noErrorTopLines()
 // Prints the top two lines for no-error screens (Brand + version info)
 void noErrorTopLines(float errorMargin)

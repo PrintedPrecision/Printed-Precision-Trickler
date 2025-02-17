@@ -35,9 +35,12 @@ int error = 0;
 //float kernelWeight
 //float grainsPerRev
 
+// Calibrate state variables
+bool recalibrateFlag = false;
+
 // Idle state variables
 int recalibrateStart = 0;
-bool recalibrateFlag = false;
+int curTime = 0;
 bool firstIdleUpdate = true;
 int btnIncrements = 0;
 
@@ -55,7 +58,7 @@ double errorMargin = 0.02;
 // Evaluate state variables
 double evaluateWeight = 0;
 bool firstEvaluate = true;
-bool evaluateUpdate = true;
+bool evaluateUpdate = false;
 long elapsedTime = 0;
 
 // CalibrationState()
@@ -78,10 +81,42 @@ int CalibrationState()
   float initialWeight;
   float finalWeight;
 
-  Serial.println("Entering calibration state, waiting for enable toggle");
+  float tempTarget;
 
   // Change display to "Waiting for Calibration" display
   WaitingToCalibrate();
+
+  // Check if we are recalibrating and avoid replacing targetWeight if so
+  if(recalibrateFlag)
+  {
+    Serial.println("Recalibrating, no saved targetWeight read required");
+    recalibrateFlag = false;
+  }
+  else
+  {
+    Serial.println("First calibration, reading saved targetWeight from EEPROM");
+
+    EEPROM.get(MEMORY_ADDR, tempTarget);
+
+    // Make sure the read value is within range
+    if((0 <= tempTarget) && (tempTarget <= 250))
+    {
+      // Set targetWeight to the read value
+      targetWeight = tempTarget;
+      Serial.print("Read target value is: '");
+      Serial.print(tempTarget, 6);
+      Serial.println("', setting targetWeight to match");
+    }
+    // Read value is out of range
+    else
+    {
+      Serial.print("Read value out of range: '");
+      Serial.print(tempTarget, 6);
+      Serial.println("', leaving targetWeight as default of 32.00gr");
+    }
+  }
+
+  Serial.println("Beginning calibration, waiting for enable toggle");
   
   // Wait for enable button press before advancing further
   while(!isEnabled())
@@ -293,6 +328,9 @@ int IdleState()
   digitalWrite(YELLOW_LED, LOW);
   digitalWrite(RED_LED, LOW);
 
+  // Reset recalibration flag, just in case
+  recalibrateFlag = false;
+
   // Change display to Idle state display
   if(firstIdleUpdate)
   {
@@ -305,7 +343,32 @@ int IdleState()
   // Advance to ready state if enable is pressed
   if(isEnabled())
   {
-    Serial.println("Enable switch toggled to on in Idle state, advancing to Ready state");
+    Serial.println("Enable switch toggled to on in Idle state");
+
+    // Check if the stored targetWeight in EEPROM has changed
+    float tempTarget;
+    EEPROM.get(MEMORY_ADDR, tempTarget);
+
+    // targetWeight has changed, need to update saved value
+    if(tempTarget != targetWeight)
+    {
+      Serial.println("Writing new targetWeight value to EEPROM");
+      Serial.print("Old value = '");
+      Serial.print(tempTarget, 6);
+      Serial.print("', new value = '");
+      Serial.print(targetWeight, 6);
+      Serial.println("'");
+
+      EEPROM.put(MEMORY_ADDR, targetWeight);
+    }
+    // targetWeight has not changed, do not update saved value
+    else
+    {
+      Serial.println("Saved targetWeight value matches current, no update necessary");
+    }
+
+    Serial.println("Advancing to Ready state");
+
     firstIdleUpdate = true;
     btnIncrements = 0;
     return READY_STATE;
@@ -313,39 +376,30 @@ int IdleState()
 
   if(upPressed() && downPressed())
   {
+    Serial.println("Up and Down buttons both pressed for the first time");
     btnIncrements = 0;
-    // Check if it's the first press of each button
-    if(!recalibrateFlag)
-    {
-      // Set the recalibrateStart time and flag
-      recalibrateStart = millis();
-      recalibrateFlag = true;
-      return IDLE_STATE;
-    }
-    else
-    {
-      // Test if the buttons have been held long enough
-      if(millis() > (recalibrateStart + 3000))
-      {
-        Serial.println("Up and Down buttons held for 3 seconds in IDLE state, exiting to Calibrate state");
-        // Go back to calibration state after resetting flags
-        recalibrateFlag = false;
-        firstIdleUpdate = true;
+    // Establish the starting time they were both pressed
+    recalibrateStart = millis();
 
-        return CALIBRATION_STATE;
+    // Check the button states on a loop until the elapsed time reaches 2 seconds
+    for(curTime = millis(); curTime < (recalibrateStart + 2000); curTime = millis())
+    {
+      if(!upPressed() || !downPressed())
+      {
+        Serial.println("A button was released early, returning to Idle state");
+        return IDLE_STATE;
       }
     }
-  }
-  // Both were previously pressed but released prior to the start of recalibration
-  else if(recalibrateFlag)
-  {
-    // Reset calibration flag and continue idle state
-    recalibrateFlag = false;
-    return IDLE_STATE;
+    // Proceed to recalibration
+    Serial.println("Both buttons held for 2000ms, setting recalibrateFlag and proceeding to Calibrate state");
+    recalibrateFlag = true; 
+
+    return CALIBRATION_STATE;
   }
   // Only up btn pressed
   else if(upPressed() && !downPressed())
   {
+    Serial.println("Only up pressed");
     // Delay and re-measure for debounce
     delay(250);
     if(!upPressed() || downPressed())
@@ -415,6 +469,7 @@ int IdleState()
   // Only down btn pressed
   else if(downPressed() && !upPressed())
   {
+    Serial.println("Only down pressed");
     // Delay and re-measure for debounce
     delay(250);
     if(upPressed() || !downPressed())
@@ -597,11 +652,11 @@ int DispenseState()
   if(weightDiff > 1)
   {
     BulkScreen(targetWeight, errorMargin);
-    // Dispense 97% of the required amount
-    // BulkDispense(weightDiff * 0.97);
+    // Dispense 95% of the required amount
+    // BulkDispense(weightDiff * 0.95);
     
-    // Dispense 97% of the required amount and wait for bulk to finish while monitoring enable button
-    if(!bulkThrow(weightDiff * 0.97))
+    // Dispense 95% of the required amount and wait for bulk to finish while monitoring enable button
+    if(!bulkThrow(weightDiff * 0.95))
     {
       Serial.println("Enable toggled off during first bulk pulse, exiting to idle");
       firstIdleUpdate = true;
@@ -623,12 +678,19 @@ int DispenseState()
       return EVALUATE_STATE;
     }
     // Perfect throw case
-    else if(weightDiff < (0.8 * errorMargin))
+    else if(weightDiff < (0.4 * errorMargin))
     {
       // Go to evaluate state
       Serial.println("1st bulk pulse hit exact targetWeight, exiting to evaluate");
 
       return EVALUATE_STATE;
+    }
+    // Advance to trickle if our weightDiff <= 1, but get a second short weight measurement first
+    else if(weightDiff <= 1)
+    {
+      Serial.println("Good 1st bulk, take long weight measurement and advance to trickle");
+      dispenseWeight = StableWeight(SHORT);
+      weightDiff = targetWeight - dispenseWeight;
     }
     // Underthrow, need a second bulk pulse
     else if(weightDiff > 1)
@@ -703,10 +765,11 @@ int DispenseState()
 
         // Do not exit dispense state in this instance
       }
-
-      TrickleScreen(targetWeight, errorMargin);
     }
   }
+  // Update the screen to indicate we are moving on to the trickle
+  TrickleScreen(targetWeight, errorMargin);
+
   // Now do a final trickle, on first entry we already have a current weight and weightDiff from above sections of code
   while(isEnabled())
   {
@@ -716,8 +779,8 @@ int DispenseState()
       dispenseWeight = StableWeight(LONG);
       weightDiff = targetWeight - dispenseWeight;
 
-      // If target weight has been reached, go to Evaluate state
-      if(weightDiff < (0.8 * errorMargin))
+      // If target weight has been reached, go directly to Evaluate state
+      if(weightDiff <= 0.01)
       {
         return EVALUATE_STATE;
       }
@@ -728,19 +791,19 @@ int DispenseState()
     int kernels = weightDiff / kernelWeight;
     float remainder = ((weightDiff / kernelWeight) - kernels) * kernelWeight;
 
-    Serial.print("Remainder after kernels have been dispensed = ");
+    Serial.print("Predicted remainder after dispening kernels = ");
     Serial.println(remainder, 6);
 
     // Check the remainder to see if we need to add an extra kernel
-    if(remainder >= (0.8 * errorMargin))
+    if(remainder >= (0.49 * errorMargin))
     {
       Serial.print("Adding kernel because remainder = ");
       Serial.println(remainder, 6);
       kernels = kernels + 1;
     }
     
-    // If weightDiff is non-zero but kernels rounds to 0 (shouldn't happen anymore with the remainder check)
-    if(!kernels && (weightDiff > (0.8 * errorMargin)))
+    // If weightDiff is non-zero but kernels rounds to 0
+    if(!kernels && (weightDiff > 0))
     {
       Serial.println("Setting kernels to 1 because of zero kernels but a postiive weight diff, this shouldn't happen anymore");
       kernels = 1;
@@ -769,7 +832,8 @@ int DispenseState()
     int delayStart = millis();
 
     // Loop for a max duration of settlingDelayMs looking for a change in the scale weight, polling every 50ms
-    while(StableWeight(50) <= dispenseWeight)
+    // Can only exit early if we disable dispensing or see the weight increase by at least 75% of the weightDiff to target
+    while(StableWeight(50) <= (dispenseWeight + (0.75 * weightDiff)))
     {
       // Return to idle if no longer enabled
       if(!isEnabled())
@@ -835,6 +899,11 @@ int DispenseState()
       {
         decreaseTrickleCalibration();
       }
+      // Do a tiny calibration change for underthrow of only 2 kernels
+      else if(weightDiff > (1.2 * errorMargin))
+      {
+        smallDecreaseTrickleCalibration();
+      }
     }
   }
   // Return idle because reaching this point means enable button is no longer pressed (we exited the isEnabled() while loop that runs the trickler)
@@ -852,7 +921,7 @@ int EvaluateState()
     Serial.println("Enable switch toggled to off in Evaluate state before weight measurements, returning to Idle state");
     // Reset evaluate and idle flags
     firstEvaluate = true;
-    evaluateUpdate = true;
+    evaluateUpdate = false;
     firstIdleUpdate = true;
 
     // Reset LEDs before exiting evaluate
@@ -864,11 +933,39 @@ int EvaluateState()
     return IDLE_STATE;
   }
 
+  // Check if user has option to add a kernel
+  if(evaluateUpdate)
+  {
+    // Check if up button has been pressed
+    if(upPressed() && !downPressed())
+    {
+      // Delay and re-measure for debounce
+      delay(100);
+      if(!upPressed() || downPressed())
+      {
+        // If button state changes go back to top of evaluate
+        return EVALUATE_STATE;
+      }
+
+      Serial.println("User has requested one additional kernel during stale evaluate state");
+
+      // Remove evaluateUpdate flag
+      evaluateUpdate = false;
+
+      // Add one kernel
+      TrickleDispense(1);
+
+      Serial.println("Kernel dispensed, returning to top of Evaluate state");
+      // Return to top of Evaluate state to assess status after kernel was added
+      return EVALUATE_STATE;
+    }
+  }
+
   // Update evaluateWeight and weightDiff as necessary TODO: might want to eliminate this portion and use a single shared currentWeight that is managed in the main function?
   // First entry to Evaluate state
   if(firstEvaluate)
   {
-    evaluateUpdate = true;
+    evaluateUpdate = false;
     firstEvaluate = false;
 
     evaluateWeight = dispenseWeight;
@@ -888,7 +985,7 @@ int EvaluateState()
   else
   {
     // Take new weight reading
-    float tmpWeight = StableWeight(2 * LONG);
+    float tmpWeight = StableWeight(LONG);
 
     // Case 1, weight has changed
     // Test if new weight reading is different from the existing one
@@ -900,7 +997,7 @@ int EvaluateState()
       {
         // Reset the evaluation flags
         firstEvaluate = true;
-        evaluateUpdate = true;
+        evaluateUpdate = false;
 
         // Reset LEDs before exiting evaluate
         digitalWrite(GREEN_LED, LOW);
@@ -912,10 +1009,9 @@ int EvaluateState()
       }
       // Case 1.2 - Weight has changed without user removing the shot glass
       // Verify this changed weight with a second measurement
-      else if(StableWeight(2 * LONG) == tmpWeight)
+      else if(StableWeight(LONG) == tmpWeight)
       {
-        // Set evaluate update flag before updating evaluateWeight and weightDiff
-        evaluateUpdate = true;
+        evaluateUpdate = false;
 
         evaluateWeight = tmpWeight;
         weightDiff = targetWeight - evaluateWeight;
@@ -948,7 +1044,7 @@ int EvaluateState()
     Serial.println("Enable switch toggled to off in Evaluate state after weight measurements, returning to Idle state");
     // Reset evaluation and idle flags
     firstEvaluate = true;
-    evaluateUpdate = true;
+    evaluateUpdate = false;
     firstIdleUpdate = true;
 
     // Reset LEDs before exiting evaluate
@@ -988,13 +1084,13 @@ int EvaluateState()
   // Case 3 - underthrow
   else
   {
-    // Reset evaluation flags since we will exit Evaluate state
-    firstEvaluate = true;
-    evaluateUpdate = true;
-
     // Handle extreme underthrow (this should never happen)
     if(weightDiff > targetWeight * 0.5)
     {
+      // Reset evaluation flags since we will exit Evaluate state
+      firstEvaluate = true;
+      evaluateUpdate = false;
+
       // Reset LEDs before exiting evaluate
       digitalWrite(GREEN_LED, LOW);
       digitalWrite(YELLOW_LED, LOW);
@@ -1006,12 +1102,16 @@ int EvaluateState()
     else
     {
       // Reset LEDs before exiting evaluate
+      StaleChargeScreen(targetWeight, evaluateWeight, elapsedTime, errorMargin);
       digitalWrite(GREEN_LED, LOW);
-      digitalWrite(YELLOW_LED, LOW);
+      digitalWrite(YELLOW_LED, HIGH);
       digitalWrite(RED_LED, LOW);
 
-      Serial.println("Underthrow detected in Evaluate state, returning to Dispense state");
-      return DISPENSE_STATE;
+      // Set evaluateUpdate flag
+      evaluateUpdate = true;
+
+      Serial.println("Underthrow detected in Evaluate state, changing to light to indicate caution but remaining in Evaluate state");
+      return EVALUATE_STATE;
     }
   }
 
@@ -1124,6 +1224,9 @@ bool waitForBulk()
     // Exit to Idle state if enable switch is toggled off at any time
     if(!isEnabled())
     {
+      Serial.println("Enable toggled off during bulk, stopping motors and ending their movement");
+      StopMotors();
+      
       EndBulk();
       EndTrickle();
       return false;
@@ -1150,6 +1253,9 @@ bool waitForTrickle()
     // Exit to Idle state if enable switch is toggled off at any time
     if(!isEnabled())
     {
+      Serial.println("Enable toggled off during trickle, stopping motors and ending their movement");
+      StopMotors();
+
       EndTrickle();
       EndBulk();
       return false;
@@ -1204,5 +1310,15 @@ void decreaseTrickleCalibration()
   SetKernelWeight(curKernel * 0.98);
 
   Serial.print("Adjusting calibration down by 2%, kernelWeight = ");
+  Serial.println(GetKernelWeight(), 6);
+}
+
+void smallDecreaseTrickleCalibration()
+{
+  // Adjust kernel weight to be slightly smaller
+  float curKernel = GetKernelWeight();
+  SetKernelWeight(curKernel * 0.99);
+
+  Serial.print("Adjusting calibration down by 1%, kernelWeight = ");
   Serial.println(GetKernelWeight(), 6);
 }
