@@ -678,7 +678,7 @@ int DispenseState()
       return EVALUATE_STATE;
     }
     // Perfect throw case
-    else if(weightDiff < (0.4 * errorMargin))
+    else if(weightDiff < 0.01)
     {
       // Go to evaluate state
       Serial.println("1st bulk pulse hit exact targetWeight, exiting to evaluate");
@@ -741,7 +741,7 @@ int DispenseState()
         return EVALUATE_STATE;
       }
       // Perfect throw case
-      else if(weightDiff < (0.8 * errorMargin))
+      else if(weightDiff < 0.01)
       {
         // Go to evaluate state
         Serial.println("2nd bulk pulse hit exact targetWeight, exiting to evaluate");
@@ -875,7 +875,7 @@ int DispenseState()
       return EVALUATE_STATE;
     }
     // Perfect throw case
-    else if(weightDiff < (0.8 * errorMargin))
+    else if(weightDiff < 0.01)
     {
       // Go to evaluate state
       Serial.println("Trickled to correct targetWeight, exiting to evaluate");
@@ -1070,7 +1070,7 @@ int EvaluateState()
     digitalWrite(RED_LED, HIGH);
   }
   // Case 2 - correct weight
-  else if(weightDiff < (0.8 * errorMargin))
+  else if(weightDiff < 0.01)
   {
     // Change the display
     Serial.println("Acceptable charge detected in Evaluate State");
