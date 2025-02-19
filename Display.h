@@ -17,7 +17,7 @@
 
 // Current software version
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 7
+#define VERSION_MINOR 8
 // Display constants
 #define LCD_COLS 20
 #define LCD_ROWS 4
