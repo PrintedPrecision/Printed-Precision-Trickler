@@ -111,6 +111,7 @@ float ReadScale()
   String asciiNum;
   char byteReceived;
   int i = 0;
+  bool isNegative = false;
 
   flushSerial();
 
@@ -143,6 +144,15 @@ float ReadScale()
     //Serial.print(byte(byteReceived));
     //Serial.print("\n");
 
+    // Test first received character to see if number is negative
+    if(j == 0)
+    {
+      byte test = byte(byteReceived);
+      if(test == 45)
+      {
+        isNegative = true;
+      }
+    }
     // Store the portion that is the number into a char array
     if(j > 0 && j < 9)
     {
@@ -159,6 +169,11 @@ float ReadScale()
   }
 
   latestWeight = asciiNum.toFloat();
+
+  if(isNegative)
+  {
+    latestWeight = latestWeight * -1;
+  }
 
   return latestWeight;
 }

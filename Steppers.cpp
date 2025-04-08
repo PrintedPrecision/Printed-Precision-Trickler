@@ -38,7 +38,7 @@ int TrickleDispense(int kernels)
   int steps = (STEPS_PER_REV / KERNELS_PER_REV) * kernels;
 
   // Command motor to begin moving the calculated number of steps
-  trickler.move(steps);
+  trickler.move(-1 * steps);
 
   return steps;
 }
@@ -78,7 +78,7 @@ void BulkDispense(float targetWeight, int recover)
   targetSteps = targetSteps + recover;
 
   // Trigger bulk to move that many steps
-  bulk.move(targetSteps);
+  bulk.move(-1 * targetSteps);
 }
 
 // BulkRetract()
@@ -86,7 +86,6 @@ void BulkDispense(float targetWeight, int recover)
 void BulkRetract(int steps)
 {
   // Turn the steps value negative before moving the desired number of steps
-  steps = steps * -1;
   bulk.move(steps);
 }
 

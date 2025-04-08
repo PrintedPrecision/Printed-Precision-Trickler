@@ -17,7 +17,7 @@
 
 // Current software version
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 8
+#define VERSION_MINOR 9
 // Display constants
 #define LCD_COLS 20
 #define LCD_ROWS 4
@@ -28,6 +28,9 @@
 bool LcdSetup();
 void WaitingToCalibrate();
 void CalibrationScreen();
+void StageOneBulk(float measured, float assigned);
+void Trickle(float measured, float assigned);
+void CalibrationComplete(float bulk, float kernel);
 
 void IdleScreen(float targetWeight, float errorMargin);
 void ReadyScreen(float targetWeight, float errorMargin);

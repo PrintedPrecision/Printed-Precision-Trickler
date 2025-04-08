@@ -39,6 +39,8 @@
 #define RETRACT_STEPS 250
 #define RECOVERY_STEPS 50
 
+#define STAGE_TWO_DEFAULT 0.7
+
 #define GREEN_LED 14
 #define YELLOW_LED 15
 #define RED_LED 16
@@ -74,7 +76,9 @@ bool waitForBulk();
 bool waitForTrickle();
 
 void increaseBulkCalibration();
+void smallIncreaseBulkCalibration();
 void decreaseBulkCalibration();
+void smallDecreaseBulkCalibration();
 void increaseTrickleCalibration();
 void smallIncreaseTrickleCalibration();
 void decreaseTrickleCalibration();

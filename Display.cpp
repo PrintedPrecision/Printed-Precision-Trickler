@@ -8,8 +8,8 @@
 hd44780_I2Cexp lcd; 
 
 // Commonly used display lines
-#define LINE1 (" Printed Precision  ")
-#define LINE2 ("Software Version ")
+#define LINE1 (" Printed  Precision ")
+#define LINE2 ("   Software v")
 
 
 // LcdSetup()
@@ -89,6 +89,72 @@ void CalibrationScreen()
   clearLine(3);
   lcd.setCursor(0,3);
   lcd.print(" Calibrating Powder ");
+}
+
+void StageOneBulk(float measured, float assigned)
+{
+  // Print display lines 1 and 2
+  lcd.setCursor(0,0);
+  lcd.print("   Stage One Bulk   ");
+
+  clearLine(1);
+  lcd.print("Expected = 20-150   ");
+
+  // Print display line 3
+  clearLine(2);
+  lcd.setCursor(0,2);
+  lcd.print("Measured = ");
+  lcd.print(measured, 4);
+  
+  // Print display line 4
+  clearLine(3);
+  lcd.setCursor(0,3);
+  lcd.print("Assigned = ");
+  lcd.print(assigned, 4);
+}
+
+void Trickle(float measured, float assigned)
+{
+  // Print display lines 1 and 2
+  lcd.setCursor(0,0);
+  lcd.print("      Trickler      ");
+
+  clearLine(1);
+  lcd.print("Expected = 0.01-0.10");
+
+  // Print display line 3
+  clearLine(2);
+  lcd.print("Measured = ");
+  lcd.print(measured, 4);
+  
+  // Print display line 4
+  clearLine(3);
+  lcd.print("Assigned = ");
+  lcd.print(assigned, 4);
+}
+
+//CalibrationComplete()
+// Displayed after completion of calibration to provide calibration values to the user
+void CalibrationComplete(float bulk, float kernel)
+{
+  // Print display lines 1 and 2
+  lcd.setCursor(0,0);
+  lcd.print(" Calibration  Ended ");
+  
+  clearLine(1);
+  lcd.print(" Disable to Proceed ");
+
+  // Print display line 3
+  clearLine(2);
+  lcd.print("    Bulk = ");
+  lcd.print(bulk);
+
+  // Print display line 4
+  clearLine(3);
+  lcd.print("  Kernel = ");
+  lcd.print(kernel, 3);
+  lcd.setCursor(17,3);
+  lcd.print("gr  ");
 }
 
 // IdleScreen()
@@ -222,7 +288,7 @@ void noErrorTopLines(float errorMargin)
   lcd.print(LINE1);
   
   lcd.setCursor(0,1);
-  lcd.print("V");
+  lcd.print("v");
   lcd.print(VERSION_MAJOR);
   lcd.print(".");
   lcd.print(VERSION_MINOR);
