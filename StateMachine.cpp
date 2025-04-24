@@ -335,7 +335,7 @@ int CalibrationState()
     // Indicate calibration fail with LEDs
     digitalWrite(GREEN_LED, LOW);
     digitalWrite(YELLOW_LED, LOW);
-    digitalWrite(RED_LED, LOW);
+    digitalWrite(RED_LED, HIGH);
 
     Trickle(kernelAverage, GetKernelWeight());
 
