@@ -3,6 +3,7 @@
 
 // Include the header file
 #include "Scale.h"
+#include "Display.h"
 
 // Persistent weight variables
 float latestWeight;
@@ -24,10 +25,19 @@ void SetupScale()
     delay(50);
   } while(!Serial1.available());
 
+  char response[20] = "                    ";
+  char newChar;
+  int i = 0;
+
   Serial.print("Scale serial number is '");
   while(Serial1.available())
   {
-    Serial.print(Serial1.read());
+    newChar = Serial1.read();
+    Serial.print(newChar);
+
+    response[i] = newChar;
+    i++;
+    LcdSetup(response);
   }
   Serial.println("'");
 }

@@ -80,7 +80,8 @@ void setup() {
   digitalWrite(BULK_ENABLE, HIGH);
 
   // Initialize the display
-  LcdSetup();
+  char response[20] = "No Response Received";
+  LcdSetup(response);
   Serial.println("Display initialized");
 
   // Initialize the scale
