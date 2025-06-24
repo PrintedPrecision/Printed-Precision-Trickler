@@ -11,6 +11,8 @@ hd44780_I2Cexp lcd;
 #define LINE1 (" Printed  Precision ")
 #define LINE2 ("   Software v")
 
+bool firstSetup = true;
+
 
 // LcdSetup()
 // Initializes the LCD and prints the initial splash screen displayed during setup state
@@ -19,13 +21,19 @@ bool LcdSetup(char* response)
   int status;
   bool result = false;
 
-  // Start the LCD and turn on the backlight
-  lcd.begin(LCD_COLS, LCD_ROWS);
+  if(firstSetup)
+  {
+    // Start the LCD and turn on the backlight
+    lcd.begin(LCD_COLS, LCD_ROWS);
+    firstSetup = false;
+  }
 
   // Print display lines 1 and 2
+  clearLine(0);
   lcd.setCursor(0,0);
   lcd.print(LINE1);
   
+  clearLine(1);
   lcd.setCursor(0,1);
   lcd.print(LINE2);
   lcd.print(VERSION_MAJOR);
@@ -37,14 +45,20 @@ bool LcdSetup(char* response)
   //lcd.print("    Initializing    ");
 
   // Print display line 4
+  clearLine(2);
   lcd.setCursor(0,2);
   lcd.print("  Connecting Scale  ");
 
   // Print out the scale response
+  clearLine(3);
   lcd.setCursor(0,3);
   lcd.print("                    ");
   lcd.setCursor(0,3);
-  lcd.print(response);
+
+  for(int i = 0; i < 20; i++)
+  {
+    lcd.print(response[i]);
+  }
 
 
   result = true;
@@ -57,9 +71,11 @@ bool LcdSetup(char* response)
 void WaitingToCalibrate()
 {
   // Print display lines 1 and 2
+  clearLine(0);
   lcd.setCursor(0,0);
   lcd.print(LINE1);
   
+  clearLine(1);
   lcd.setCursor(0,1);
   lcd.print(LINE2);
   lcd.print(VERSION_MAJOR);
@@ -67,10 +83,12 @@ void WaitingToCalibrate()
   lcd.print(VERSION_MINOR);
 
   // Print display line 3
+  clearLine(2);
   lcd.setCursor(0,2);
   lcd.print("    Press Enable    ");
 
   // Print display line 4
+  clearLine(3);
   lcd.setCursor(0,3);
   lcd.print("    To Calibrate    ");
 }
@@ -80,9 +98,11 @@ void WaitingToCalibrate()
 void CalibrationScreen()
 {
   // Print display lines 1 and 2
+  clearLine(0);
   lcd.setCursor(0,0);
   lcd.print(LINE1);
   
+  clearLine(1);
   lcd.setCursor(0,1);
   lcd.print(LINE2);
   lcd.print(VERSION_MAJOR);
@@ -101,6 +121,7 @@ void CalibrationScreen()
 void StageOneBulk(float measured, float assigned)
 {
   // Print display lines 1 and 2
+  clearLine(0);
   lcd.setCursor(0,0);
   lcd.print("   Stage One Bulk   ");
 
@@ -123,6 +144,7 @@ void StageOneBulk(float measured, float assigned)
 void Trickle(float measured, float assigned)
 {
   // Print display lines 1 and 2
+  clearLine(0);
   lcd.setCursor(0,0);
   lcd.print("      Trickler      ");
 
@@ -148,6 +170,7 @@ void Trickle(float measured, float assigned)
 void CalibrationComplete(float bulk, float kernel)
 {
   // Print display lines 1 and 2
+  clearLine(0);
   lcd.setCursor(0,0);
   lcd.print(" Calibration  Ended ");
   
@@ -175,6 +198,8 @@ void CalibrationComplete(float bulk, float kernel)
 void IdleScreen(float targetWeight, float errorMargin)
 {
   // Print display lines 1 and 2
+  clearLine(0);
+  clearLine(1);
   noErrorTopLines(errorMargin);
 
   // Print display line 3
@@ -194,6 +219,8 @@ void IdleScreen(float targetWeight, float errorMargin)
 void ReadyScreen(float targetWeight, float errorMargin)
 {
   // Print display lines 1 and 2
+  clearLine(0);
+  clearLine(1);
   noErrorTopLines(errorMargin);
 
   // Print display line 3
@@ -213,6 +240,8 @@ void ReadyScreen(float targetWeight, float errorMargin)
 void BulkScreen(float targetWeight, float errorMargin)
 {
   // Print display lines 1 and 2
+  clearLine(0);
+  clearLine(1);
   noErrorTopLines(errorMargin);
 
   // Print display line 3
@@ -232,6 +261,8 @@ void BulkScreen(float targetWeight, float errorMargin)
 void TrickleScreen(float targetWeight, float errorMargin)
 {
   // Print display lines 1 and 2
+  clearLine(0);
+  clearLine(1);
   noErrorTopLines(errorMargin);
 
   // Print display line 3
@@ -249,10 +280,12 @@ void TrickleScreen(float targetWeight, float errorMargin)
 void GoodChargeScreen(float targetWeight, float finalWeight, int duration, float errorMargin)
 {
   // Print the 1st display line
+  clearLine(0);
   lcd.setCursor(0,0);
   lcd.print(LINE1);
 
   // Print the 2nd display line
+  clearLine(1);
   lcd.setCursor(0,1);
   lcd.print(" Trickle Completed! ");
 
@@ -272,10 +305,12 @@ void GoodChargeScreen(float targetWeight, float finalWeight, int duration, float
 void OverthrowScreen(float targetWeight, float finalWeight, int duration, float errorMargin)
 {
   // Print the 1st display line
+  clearLine(0);
   lcd.setCursor(0,0);
   lcd.print(LINE1);
 
   // Print 2nd display line
+  clearLine(1);
   lcd.setCursor(0,1);
   lcd.print(" OVERTHROW WARNING! ");
 
@@ -295,10 +330,12 @@ void OverthrowScreen(float targetWeight, float finalWeight, int duration, float 
 void StaleChargeScreen(float targetWeight, float finalWeight, int duration, float errorMargin)
 {
   // Print the 1st display line
+  clearLine(0);
   lcd.setCursor(0,0);
   lcd.print(LINE1);
 
   // Print 2nd display line
+  clearLine(1);
   lcd.setCursor(0,1);
   lcd.print("  CHANGE DETECTED!  ");
 
@@ -317,10 +354,12 @@ void StaleChargeScreen(float targetWeight, float finalWeight, int duration, floa
 void LowChargeScreen(float targetWeight, float finalWeight, int duration, float errorMargin)
 {
   // Print the 1st display line
+  clearLine(0);
   lcd.setCursor(0,0);
   lcd.print(LINE1);
 
   // Print 2nd display line
+  clearLine(1);
   lcd.setCursor(0,1);
   lcd.print("UNDERTHROW DETECTED!");
 
