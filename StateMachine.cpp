@@ -847,7 +847,7 @@ int DispenseState()
         return EVALUATE_STATE;
       }
       // Fine tune calibration on close calls to avoid overthrows
-      else if(weightDiff < 0.1)
+      else if(weightDiff < 0.2)
       {
         Serial.println("Second bulk pulse too close to target, adjusting calibration");
         secondBulkCalibration = secondBulkCalibration - 0.005;
