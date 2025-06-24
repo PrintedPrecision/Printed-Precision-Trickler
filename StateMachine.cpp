@@ -335,7 +335,7 @@ int CalibrationState()
     // Indicate calibration fail with LEDs
     digitalWrite(GREEN_LED, LOW);
     digitalWrite(YELLOW_LED, LOW);
-    digitalWrite(RED_LED, HIGH);
+    digitalWrite(RED_LED, LOW);
 
     Trickle(kernelAverage, GetKernelWeight());
 
@@ -711,8 +711,21 @@ int DispenseState()
   // Gather the current weight and calculate our weight difference stuff
   dispenseWeight = StableWeight(LONG);
   float weightDiff = targetWeight - dispenseWeight;
+  float startingWeightDiff = weightDiff;
 
   startTime = millis();
+
+  // First skip straight to evaluate if weightDiff is negative
+  if(weightDiff <= 0)
+  {
+    return EVALUATE_STATE;
+  }
+
+  // If the weightDiff is greater than 250gr, skip straight to evaluate because something is wrong
+  if(weightDiff > 250)
+  {
+    return EVALUATE_STATE;
+  }
 
   // Do first stage bulk dispense if we need 10+ grains
   if(weightDiff > 10)
@@ -732,15 +745,22 @@ int DispenseState()
     // Collect weight again to evaluate next steps
     dispenseWeight = StableWeight(SHORT);
     weightDiff = targetWeight - dispenseWeight;
+    float dispenseTotal = startingWeightDiff - weightDiff;
+
+    // Less than 1gr was dispensed, skip straight to eval state
+    if(dispenseTotal < 1)
+    {
+      return EVALUATE_STATE;
+    }
 
     // Getting too close to target case, small calibration adjustment
-    if(weightDiff < (0.02 * targetWeight))
+    else if(weightDiff < (0.02 * targetWeight))
     {
       Serial.println("First bulk pulse too close to target, making slight calibration adjustment");
       smallIncreaseBulkCalibration();
     }
     // Overthrow case, adjust calibration
-    if(weightDiff < (-1.2 * errorMargin))
+    else if(weightDiff < (-1.2 * errorMargin))
     {
       Serial.println("First bulk pulse overthrow, exiting to evaluate");
       increaseBulkCalibration();
@@ -818,13 +838,26 @@ int DispenseState()
       // Perfect throw case
       else if(weightDiff < 0.01)
       {
-        // Go to evaluate state
+        // Go to evaluate state after adjusting calibration
         Serial.println("2nd bulk pulse hit exact targetWeight, exiting to evaluate");
+        secondBulkCalibration = secondBulkCalibration - 0.005;
+        Serial.print("secondBulkCalibration reduced by 0.005, new value = ");
+        Serial.println(secondBulkCalibration);
 
         return EVALUATE_STATE;
       }
-      // Handle extreme underthrow first
-      else if(weightDiff > targetWeight * 0.5)
+      // Fine tune calibration on close calls to avoid overthrows
+      else if(weightDiff < 0.2)
+      {
+        Serial.println("Second bulk pulse too close to target, adjusting calibration");
+        secondBulkCalibration = secondBulkCalibration - 0.005;
+        Serial.print("secondBulkCalibration reduced by 0.005, new value = ");
+        Serial.println(secondBulkCalibration);
+
+        // Do not exit dispense state in this instance
+      }
+      // Handle extreme underthrow case (relative to starting point, not relative to target weight now that re-trickle was added)
+      else if(weightDiff > startingWeightDiff * 0.5)
       {
         Serial.println("Extreme underthrow error during second bulk pulse");
         
@@ -878,13 +911,26 @@ int DispenseState()
     // Perfect throw case
     else if(weightDiff < 0.01)
     {
-      // Go to evaluate state
+      // Go to evaluate state after adjusting calibration
       Serial.println("2nd bulk pulse hit exact targetWeight, exiting to evaluate");
+      secondBulkCalibration = secondBulkCalibration - 0.005;
+      Serial.print("secondBulkCalibration reduced by 0.005, new value = ");
+      Serial.println(secondBulkCalibration);
 
       return EVALUATE_STATE;
     }
-    // Handle extreme underthrow first
-    else if(weightDiff > targetWeight * 0.5)
+    // Fine tune calibration on close calls to avoid overthrows
+    else if(weightDiff < 0.1)
+    {
+      Serial.println("Second bulk pulse too close to target, adjusting calibration");
+      secondBulkCalibration = secondBulkCalibration - 0.005;
+      Serial.print("secondBulkCalibration reduced by 0.005, new value = ");
+      Serial.println(secondBulkCalibration);
+
+      // Do not exit dispense state in this instance
+    }
+    // Handle extreme underthrow case (relative to starting point, not relative to target weight now that re-trickle was added)
+    else if(weightDiff > startingWeightDiff * 0.5)
     {
       Serial.println("Extreme underthrow error during second bulk pulse");
         
@@ -907,6 +953,12 @@ int DispenseState()
   // Now do a final trickle, on first entry we already have a current weight and weightDiff from above sections of code
   while(isEnabled())
   {
+    // Do not allow it to trickle more than 5gr of powder
+    if(weightDiff > 5)
+    {
+      return DISPENSE_STATE;
+    }
+    
     // If weightDiff is one kernel or less, re-measure the weight just in case
     if(weightDiff < (1.2 * errorMargin))
     {
@@ -949,6 +1001,16 @@ int DispenseState()
 
       // Immediately proceed to evaluate state
       return EVALUATE_STATE;
+    }
+
+    // Adjust kernel target for longer trickles
+    if(weightDiff > 0.75)
+    {
+      kernels = kernels - 3;
+    }
+    else if(weightDiff > 0.4)
+    {
+      kernels = kernels - 1;
     }
 
     Serial.print("Fine trickling '");
@@ -1028,7 +1090,7 @@ int DispenseState()
     else
     {
       // Handle extreme underthrow
-      if(weightDiff > targetWeight * 0.5)
+      if(weightDiff > 2)
       {
         Serial.println("Extreme underthrow error during trickle");
 
@@ -1135,8 +1197,8 @@ int EvaluateState()
     if(tmpWeight != evaluateWeight)
     {
       // Case 1.1 - tmpWeight indicates user has removed the shot glass
-      // Verify weight is less than -500, since shot glass will weigh at least that much
-      if(tmpWeight > 500)
+      // Verify weight is less than -200 or greater than 500 (overflow error), since shot glass will weigh at least that much
+      if(tmpWeight > 500 || tmpWeight < -200)
       {
         // Reset the evaluation flags
         firstEvaluate = true;
@@ -1228,21 +1290,21 @@ int EvaluateState()
   else
   {
     // Handle extreme underthrow (this should never happen)
-    if(weightDiff > targetWeight * 0.5)
+    if(weightDiff > 5)
     {
-      // Reset evaluation flags since we will exit Evaluate state
-      firstEvaluate = true;
-      evaluateUpdate = false;
-
-      // Reset LEDs before exiting evaluate
+      // Reset LEDs before exiting evaluate (yellow plus red for extreme underthrow)
+      LowChargeScreen(targetWeight, evaluateWeight, elapsedTime, errorMargin);
       digitalWrite(GREEN_LED, LOW);
-      digitalWrite(YELLOW_LED, LOW);
-      digitalWrite(RED_LED, LOW);
+      digitalWrite(YELLOW_LED, HIGH);
+      digitalWrite(RED_LED, HIGH);
+
+      // Set evaluateUpdate flag
+      evaluateUpdate = true;
 
       Serial.println("Extreme underthrow error during evaluate");
-      return READY_STATE;
+      return EVALUATE_STATE;
     }
-    // Underthrow by more than 0.02gr (which tests are good throw above), but less than the calibrated kernel weight
+    // Underthrow by more than 0.02gr (which tests as a good throw above), but less than the calibrated kernel weight
     else if(weightDiff <= (1.2 * kernelWeight))
     {
       // Reset LEDS before exiting evaluate (both green and yellow illuminated for this case)
@@ -1260,7 +1322,7 @@ int EvaluateState()
     else
     {
       // Reset LEDs before exiting evaluate (yellow only for true underthrow)
-      StaleChargeScreen(targetWeight, evaluateWeight, elapsedTime, errorMargin);
+      LowChargeScreen(targetWeight, evaluateWeight, elapsedTime, errorMargin);
       digitalWrite(GREEN_LED, LOW);
       digitalWrite(YELLOW_LED, HIGH);
       digitalWrite(RED_LED, LOW);
@@ -1341,6 +1403,12 @@ bool downPressed()
 // Does a bulk throw, including the retraction at the end
 bool bulkThrow(float grains)
 {
+  // Do not allow dispensing of more than 250 grains of powder
+  if(grains > 250)
+  {
+    return false;
+  }
+
   // Bulk dispense the requested number of grains of powder
   BulkDispense(grains, (1.5 * RECOVERY_STEPS));
 
@@ -1412,6 +1480,16 @@ bool waitForTrickle()
     if(!isEnabled())
     {
       Serial.println("Enable toggled off during trickle, stopping motors and ending their movement");
+      StopMotors();
+
+      EndTrickle();
+      EndBulk();
+      return false;
+    }
+    // Stop the trickle if the weight goes below zero at any time
+    if(StableWeight(50) < 0)
+    {
+      Serial.println("Cup removed during trickle, stopping motors and ending their movement");
       StopMotors();
 
       EndTrickle();
