@@ -1290,7 +1290,7 @@ int EvaluateState()
   else
   {
     // Handle extreme underthrow (this should never happen)
-    if(weightDiff > 1)
+    if(weightDiff > 5)
     {
       // Reset LEDs before exiting evaluate (yellow plus red for extreme underthrow)
       LowChargeScreen(targetWeight, evaluateWeight, elapsedTime, errorMargin);
