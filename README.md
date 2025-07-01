@@ -1,5 +1,19 @@
 # Printed Precision Trickler
 
+## Important Safety Information
+Reloading is an enjoyable way to produce high-quality ammunition in a safe fashion, but like all other aspects of shooting sports it is not entirely hazard-free. The explosive compounds that make up gunpowder are not forgiving of carelessness or negligence, making it critical that users take care to follow established directions and safety recommendations while using the Printed Precision Trickler.
+
+- Reload only when you can give your undivided attention to the task at hand
+- Use only laboratory tested and published reloading data and adhere to maximum load restrictions
+- Safeguard your reloading area from any potential sources of open flame, ***INCLUDING SMOKING***
+- Keep your reloading area clean and tidy, immediately clearing any spilled or loose powder to avoid it contaminating or accumulating in/on any electrical circuits
+- Verify the weight reading of the scale at the start and finish of each measured charge, ensuring that it was properly zeroed beforehand and the desired charge weight has been dispensed afterwards
+- Empty the Printed Precision Trickler System of powder at the end of each loading session. ***Do not use the Printed Precision Trickler System for long-term storage of smokeless powder.***
+
+***THE PRINTED PRECISION TRICKLER AND THE SCALE IT UTILIZES ARE DESIGNED FOR USE WITH SMOKELESS POWDERS ONLY! DO NOT USE THE PRINTED PRECISION TRICKLER OR ELECTRONIC SCALES WITH BLACK POWDER, AS BLACK POWDER CAN CAUSE SHORTS IN ELECTRICAL CIRCUITS AND IGNITE UPON CONTACT WITH ELECTRICAL SPARKS!***
+
+Printed Precision LLC is not liable for damages incurred by improper, careless, or negligent usage of the Printed Precision Trickler, including failures to adhere to safety-tested load information or inaccuracy of published reloading data relied upon by users.
+
 ## Parts Included
 Your Printed Precision Trickler will ship with the following list of parts. Modules requiring user-assembly are indicated below in bold italics.
 1. Base Module ***(User Assembly MAy Be Required)***
@@ -201,7 +215,20 @@ Due to the large number of possible configurations for an fx-series scale from t
 12. Press ON:OFF to turn the scale off, proceed to the NTEP Scale Unlocking instructions above
 
 ## Operating Instructions
-The Printed Precision Trickler has been designed to allow anyone to quickly and easily dispense accurate powder charges without needing to download and pair a companion app or navigate complex menus for configuration. To achieve this goal, your trickler's Control Unit has the following important items:
+The Printed Precision Trickler has been designed to allow anyone to quickly and easily dispense accurate powder charges without needing to download and pair a companion app or navigate complex menus for configuration. The basic user workflow is as follows:
+
+1) Complete assembly and set-up according to above instruction
+2) Fill the bulk dispenser's hopper with powder, select and install a trickler disk, and place 30-75gr of powder within the cup of the trickle dispenser
+3) Plug the power cable into the control unit and follow on-screen prompts to complete initial calibration
+4) After releasing the enable toggle button at the end of calibration, use the left and right buttons to increase or decrease the targeted weight to match your desired charge
+5) Ensure the charge cup is seated on the weighing plate, and depress the enable toggle button to begin dispensing
+6) Wait for the green light to illuminate once powder has been dispensed to indicate a successfully measured charge
+7) Retrieve charge cup and pour the powder into your cartridge case
+8) Replace charge cup on the weighing plate and wait, as the dispense cycle will automatically repeat itself
+
+When you are finished dispensing charges, or if you wish to stop in the middle of a dispensed charge for any reason, simply press the enable toggle button again to release it and disable all dispensing activity. Upon completion of your reloading session, empty all smokeless powder from the Printed Precision Trickler System into proper storage containers and verify that both the scale and your reloading area are clean and free of any loose powder kernels.
+
+Below you may find additional details about your trickler that will be helpful in understanding it's operation and usage:
 
 ### Trickler Disk Selection
 The selection of which disk to use in your Printed Precision Trickler is an important one, but fortunately it's also easy to make. Past examples of disk tricklers transported kernels laying down on their side, making the proper fitment sensitive to both kernel length and kernel diameter. 
@@ -229,9 +256,11 @@ The green light on the right is used to indicate that calibration was successful
 
 ### Front Panel Buttons
 The Control Unit has 3 different buttons on its front panel, directly underneath the display. The ones on the left and right are standard buttons that release when you stop pushing them, but the middle item is a toggle switch that serves to enable and disable the dispensing of powder during use. 
+
 The middle switch will depress slightly and light up with a blue ring around the center button when it is enabled, and the light will turn off when it is released and disabled. While this middle switch is enabled, the left and right buttons won't change anything to prevent any accidental adjustments in the middle of a loading session.
 When the middle switch is disabled, you may use the left button to decrease the targeted charge weight or the right button to increase the target weight. Pressing and holding either button will continuously increment/decrement the target weight, and the longer you hold the faster it will adjust. It starts out as 0.02gr increments, stepping up to 0.1gr and later full 1gr increments to make even large adjustments in target weight fast and easy.
-If you ever notice unusual behavior the left and right buttons can also be used to request recalibration of the Bulk and Trickle dispensers. Simply press and hold both left and right buttons at the same time for at least 1 second and the trickler will go into Calibration mode.
+
+If you ever notice unusual behavior or inaccurately dispensed charges, the left and right buttons can also be used to request recalibration of the Bulk and Trickle dispensers. Simply press and hold both left and right buttons at the same time for at least 1 second and the trickler will go into Calibration mode.
 
 ### Display
 While the indicator lights are handy for information at a glance while dispensing, the display on the front of the Control Unit will provide you with additional details about the configuration and current status of the Printed Precision Trickler. Throughout use this display will show you one of 5 distinct states:
@@ -239,7 +268,7 @@ While the indicator lights are handy for information at a glance while dispensin
 #### Initialization
 When you first plug the power adapter into the Control Unit it will perform initialization and attempt to establish a connection with your scale. The scale must be powered by its own separate power adapter for this, but it doesn't have to be turned on yet. The display will notify you during this time if a scale connection cannot be established.
 
-#### Calibration
+#### Calibration/Re-Calibration
 After a connection is established, the trickler will proceed to initial calibration and you will be prompted by the display to press the enable toggle to begin. Make sure you have powder in the bulk hopper/trickler cup when doing this, as well as an empty cup in place to catch dispensed kernels! It will run both the bulk and trickler motors to measure how fast the Bulk Module is dispensing and the kernel weight of your currently-loaded powder.
 This is the same state you will enter if you press and hold the left and right buttons to re-calibrate the unit.
 
