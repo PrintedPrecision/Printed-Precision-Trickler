@@ -37,6 +37,8 @@ int error = 0;
 
 // Calibrate state variables
 bool recalibrateFlag = false;
+float versionNumber = (VERSION_MAJOR * 1) + (VERSION_MINOR * 0.1);
+int motorDirection = 1;
 
 // Idle state variables
 int recalibrateStart = 0;
@@ -78,6 +80,110 @@ int CalibrationState()
   digitalWrite(YELLOW_LED, LOW);
   digitalWrite(RED_LED, LOW);
 
+  // Read stored version number and motor direction from EEPROM to compare to current version
+  float storedVersion;
+  int storedDirection;
+  bool loopFlag = true;
+  EEPROM.get(VERSION_MEMORY_ADDR, storedVersion);
+  EEPROM.get(DIRECTION_MEMORY_ADDR, storedDirection);
+
+  // First time setup, we need to calibrate motor direction in this instance
+  if (storedVersion != versionNumber)
+  {
+    Serial.println("Starting first time setup");
+    // Display the First Time Setup screen and set motor direction
+    MotorDirectionSetup();
+    SetMotorDirection(motorDirection);
+
+    // Start looping until the up or the down button has been pressed
+    while(loopFlag)
+    {
+      Serial.println("No button pressed, doing a half turn of bulk motor");
+      // Make bulk motor do a 1/2 turn
+      if(!bulkThrow(0.5 * GetBulkWeight(), true))
+      {
+        Serial.println("First time setup failed somehow, things are seriously wrong");
+        // Reset flags and return to idle state
+        firstIdleUpdate = true;
+        recalibrateFlag = false;
+        return IDLE_STATE;
+      }
+      delay(500);
+
+      // Check if either button has been pressed
+      if(upPressed() || downPressed())
+      {
+        // Wait for debounce and verify
+        delay(250);
+
+        // Motor is rotating clockwise, backwards, so need to reverse the motor direction before storing it to EEPROM
+        if(upPressed() && !downPressed())
+        {
+          Serial.println("Up button detected, reversing motor direction");
+          motorDirection = -motorDirection;
+          EEPROM.put(DIRECTION_MEMORY_ADDR, motorDirection);
+          SetMotorDirection(motorDirection);
+
+          loopFlag = false;
+        }
+
+        // Motor is correct, do not change before storing to EEPROM
+        else if(downPressed())
+        {
+          Serial.println("Down button detected, motor direction staying unchanged");
+          EEPROM.put(DIRECTION_MEMORY_ADDR, motorDirection);
+
+          loopFlag = false;
+        }
+      }
+    }
+    bool startingEnabled = isEnabled();
+
+    // Check the motor direction before storing version info
+    MotorDirectionStored(motorDirection);
+    if(!bulkThrow(3 * GetBulkWeight(), true))
+    {
+      Serial.println("First time setup failed somehow, things are seriously wrong");
+      // Reset flags and return to idle state
+      firstIdleUpdate = true;
+      recalibrateFlag = false;
+      return IDLE_STATE;
+    }
+    delay(1000);
+
+    if(isEnabled() != startingEnabled)
+    {
+      Serial.println("User has confirmed it's wrong, just go straight to idle and force them to restart to fix");
+      firstIdleUpdate = true;
+      recalibrateFlag = false;
+      return IDLE_STATE;
+    }
+
+    // Store the versionNumber to EEPROM and then we're good to go
+    EEPROM.put(VERSION_MEMORY_ADDR, versionNumber);
+
+    Serial.print("Stored '");
+    Serial.print(versionNumber, 6);
+    Serial.print("' to the version number and '");
+    Serial.print(motorDirection, 2);
+    Serial.println("' to the motorDirection");
+  }
+  // First time setup has already been done before
+  else
+  {
+    // Set the motor direction to be equal to the one read from EEPROM
+    if(storedDirection > 0)
+    {
+      motorDirection = 1;
+      SetMotorDirection(motorDirection);
+    }
+    else
+    {
+      motorDirection = -1;
+      SetMotorDirection(motorDirection);
+    }
+  }
+
   float initialWeight;
   float finalWeight;
 
@@ -96,7 +202,7 @@ int CalibrationState()
   {
     Serial.println("First calibration, reading saved targetWeight from EEPROM");
 
-    EEPROM.get(MEMORY_ADDR, tempTarget);
+    EEPROM.get(TARGET_MEMORY_ADDR, tempTarget);
 
     // Make sure the read value is within range
     if((0 <= tempTarget) && (tempTarget <= 250))
@@ -303,7 +409,7 @@ int CalibrationState()
     Serial.println("'");
 
     // Adjust the errorMargin in case of chonky kernels
-    if(kernelAverage > 0.03 && kernelAverage <= 0.05)
+    if(kernelAverage > 0.035 && kernelAverage <= 0.05)
     {
       Serial.println("Setting errorMargin to 0.04 because of kernelWeight");
       errorMargin = 0.04;
@@ -408,7 +514,7 @@ int IdleState()
 
     // Check if the stored targetWeight in EEPROM has changed
     float tempTarget;
-    EEPROM.get(MEMORY_ADDR, tempTarget);
+    EEPROM.get(TARGET_MEMORY_ADDR, tempTarget);
 
     // targetWeight has changed, need to update saved value
     if(tempTarget != targetWeight)
@@ -420,7 +526,7 @@ int IdleState()
       Serial.print(targetWeight, 6);
       Serial.println("'");
 
-      EEPROM.put(MEMORY_ADDR, targetWeight);
+      EEPROM.put(TARGET_MEMORY_ADDR, targetWeight);
     }
     // targetWeight has not changed, do not update saved value
     else
@@ -847,7 +953,7 @@ int DispenseState()
         return EVALUATE_STATE;
       }
       // Fine tune calibration on close calls to avoid overthrows
-      else if(weightDiff < 0.2)
+      else if(weightDiff < 0.1)
       {
         Serial.println("Second bulk pulse too close to target, adjusting calibration");
         secondBulkCalibration = secondBulkCalibration - 0.005;
@@ -1139,7 +1245,7 @@ int EvaluateState()
   }
 
   // Check if user has option to add a kernel
-  if(evaluateUpdate)
+  if(!firstEvaluate)
   {
     // Check if up button has been pressed
     if(upPressed() && !downPressed())
@@ -1154,11 +1260,11 @@ int EvaluateState()
 
       Serial.println("User has requested one additional kernel during stale evaluate state");
 
-      // Remove evaluateUpdate flag
-      evaluateUpdate = false;
-
       // Add one kernel
       TrickleDispense(1);
+
+      // Wait for half a second to avoid rapid fire kernel dispenses
+      delay(500);
 
       Serial.println("Kernel dispensed, returning to top of Evaluate state");
       // Return to top of Evaluate state to assess status after kernel was added
@@ -1290,7 +1396,7 @@ int EvaluateState()
   else
   {
     // Handle extreme underthrow (this should never happen)
-    if(weightDiff > 5)
+    if(weightDiff > 1)
     {
       // Reset LEDs before exiting evaluate (yellow plus red for extreme underthrow)
       LowChargeScreen(targetWeight, evaluateWeight, elapsedTime, errorMargin);
@@ -1401,7 +1507,7 @@ bool downPressed()
 }
 
 // Does a bulk throw, including the retraction at the end
-bool bulkThrow(float grains)
+bool bulkThrow(float grains, bool forceContinue)
 {
   // Do not allow dispensing of more than 250 grains of powder
   if(grains > 250)
@@ -1412,7 +1518,7 @@ bool bulkThrow(float grains)
   // Bulk dispense the requested number of grains of powder
   BulkDispense(grains, (1.5 * RECOVERY_STEPS));
 
-  if(!waitForBulk())
+  if(!waitForBulk(forceContinue))
   {
     Serial.println("Bulk throw cancelled during the dispense phase");
     // Return false if enable is toggled to off during the bulk dispense
@@ -1422,7 +1528,7 @@ bool bulkThrow(float grains)
   // Retract the bulk trickler by the specified retraction distance
   BulkRetract(RETRACT_STEPS);
 
-  if(!waitForBulk())
+  if(!waitForBulk(forceContinue))
   {
     Serial.println("Bulk throw cancelled during the 1st retract phase");
     // Return false if enable is toggled to off during the retraction
@@ -1431,7 +1537,7 @@ bool bulkThrow(float grains)
 
   // Go forwards the recovery distance
   BulkRetract(-1 * RECOVERY_STEPS);
-  if(!waitForBulk())
+  if(!waitForBulk(forceContinue))
   {
     Serial.println("Bulk throw cancelled during the shimmy phase");
     // Return false if enable is toggled to off during the retraction
@@ -1442,13 +1548,13 @@ bool bulkThrow(float grains)
   return true;
 }
 
-bool waitForBulk()
+bool waitForBulk(bool forceContinue)
 {
   // Wait for initial bulk to complete
   while(IsBulking())
   {
     // Exit to Idle state if enable switch is toggled off at any time
-    if(!isEnabled())
+    if(!isEnabled() && !forceContinue)
     {
       Serial.println("Enable toggled off during bulk, stopping motors and ending their movement");
       StopMotors();

@@ -93,6 +93,53 @@ void WaitingToCalibrate()
   lcd.print("    To Calibrate    ");
 }
 
+void MotorDirectionSetup()
+{
+  // Print display line 1
+  clearLine(0);
+  lcd.setCursor(0,0);
+  lcd.print("  First Time Setup  ");
+
+  // Print display line 2
+  clearLine(1);
+  lcd.setCursor(0,1);
+  lcd.print("Push Button For Spin");
+
+  // Print display line 3
+  clearLine(2);
+  lcd.setCursor(0,2);
+  lcd.print("<<  Counterclockwise");
+
+  // Print display line 4
+  clearLine(3);
+  lcd.setCursor(0,3);
+  lcd.print("     Clockwise    >>");
+}
+
+void MotorDirectionStored(int direction)
+{
+  // Print display line 1
+  clearLine(0);
+  lcd.setCursor(0,0);
+  lcd.print("Motor Setup Complete");
+
+  // Print display line 2
+  clearLine(1);
+  lcd.setCursor(0,1);
+  lcd.print("motorDirection = ");
+  lcd.print(direction);
+
+  // Print display line 3
+  clearLine(2);
+  lcd.setCursor(0,2);
+  lcd.print("  Motor Going CCW?  ");
+
+  // Print display line 4
+  clearLine(3);
+  lcd.setCursor(0,3);
+  lcd.print("Toggle Enable If Bad");
+}
+
 // CalibrationScreen()
 // Displayed during the calibration state
 void CalibrationScreen()

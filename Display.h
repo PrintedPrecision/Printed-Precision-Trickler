@@ -17,7 +17,8 @@
 
 // Current software version
 #define VERSION_MAJOR 1
-#define VERSION_MINOR 0
+#define VERSION_MINOR 1
+
 // Display constants
 #define LCD_COLS 20
 #define LCD_ROWS 4
@@ -27,6 +28,8 @@
 // Returns true on success, or false on failure
 bool LcdSetup(char* response);
 void WaitingToCalibrate();
+void MotorDirectionSetup();
+void MotorDirectionStored(int direction);
 void CalibrationScreen();
 void StageOneBulk(float measured, float assigned);
 void Trickle(float measured, float assigned);

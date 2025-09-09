@@ -55,4 +55,6 @@ void SetBulkWeight(float newValue);
 
 void StopMotors();
 
+bool SetMotorDirection(int direction);
+
 #endif // STEPPERS_H

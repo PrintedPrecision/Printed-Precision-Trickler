@@ -45,7 +45,9 @@
 #define YELLOW_LED 15
 #define RED_LED 16
 
-#define MEMORY_ADDR 0
+#define TARGET_MEMORY_ADDR 0
+#define VERSION_MEMORY_ADDR 10
+#define DIRECTION_MEMORY_ADDR 20
 
 // Error tracker values
 // 0 = No error
@@ -70,9 +72,9 @@ bool isEnabled();
 bool upPressed();
 bool downPressed();
 
-bool bulkThrow(float grains);
+bool bulkThrow(float grains, bool forceContinue = false);
 
-bool waitForBulk();
+bool waitForBulk(bool forceContinue = false);
 bool waitForTrickle();
 
 void increaseBulkCalibration();
