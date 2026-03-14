@@ -85,6 +85,7 @@ void increaseTrickleCalibration();
 void smallIncreaseTrickleCalibration();
 void decreaseTrickleCalibration();
 void smallDecreaseTrickleCalibration();
+void tinyDecreaseTrickleCalibration();
 
 
 #endif // STATES_H

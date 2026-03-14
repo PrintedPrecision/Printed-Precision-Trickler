@@ -51,7 +51,7 @@ bool firstReadyUpdate = true;
 
 // Dispense state variables
 double dispenseWeight = 0;
-double targetWeight = 32.00; // Default target weight of 32.00gr
+double targetWeight = 32; // Default target weight of -2gr
 long startTime = 0;
 long endTime = 0;
 float secondBulkCalibration = STAGE_TWO_DEFAULT;
@@ -80,15 +80,18 @@ int CalibrationState()
   digitalWrite(YELLOW_LED, LOW);
   digitalWrite(RED_LED, LOW);
 
-  // Read stored version number and motor direction from EEPROM to compare to current version
-  float storedVersion;
-  int storedDirection;
+  // Create loop flag for first time calibration
   bool loopFlag = true;
-  EEPROM.get(VERSION_MEMORY_ADDR, storedVersion);
+
+  // Read stored version number and motor direction from EEPROM to compare to current version
+  int storedDirection;
   EEPROM.get(DIRECTION_MEMORY_ADDR, storedDirection);
 
-  // First time setup, we need to calibrate motor direction in this instance
-  if (storedVersion != versionNumber)
+  double storedTarget;
+  EEPROM.get(TARGET_MEMORY_ADDR, storedTarget);
+
+  // First time setup, we need to calibrate motor direction in this instance (or manually commanded first-time setup which is 0xFFFFFF or -
+  if (isnan(storedTarget) || storedTarget <= 0 || storedTarget > 275)
   {
     Serial.println("Starting first time setup");
     // Display the First Time Setup screen and set motor direction
@@ -161,6 +164,7 @@ int CalibrationState()
 
     // Store the versionNumber to EEPROM and then we're good to go
     EEPROM.put(VERSION_MEMORY_ADDR, versionNumber);
+    EEPROM.put(TARGET_MEMORY_ADDR, targetWeight);
 
     Serial.print("Stored '");
     Serial.print(versionNumber, 6);
@@ -187,10 +191,10 @@ int CalibrationState()
   float initialWeight;
   float finalWeight;
 
-  float tempTarget;
+  double tempTarget;
 
   // Change display to "Waiting for Calibration" display
-  WaitingToCalibrate();
+  WaitingToCalibrate(motorDirection);
 
   // Check if we are recalibrating and avoid replacing targetWeight if so
   if(recalibrateFlag)
@@ -763,17 +767,26 @@ int ReadyState()
     return READY_STATE;
   }
 
-  // Check if we should exit to dispense state
-  if((currentWeight > -0.5) && (currentWeight < (targetWeight + 0.5)))
+  // Check if we should exit to dispense state (either empty cup or a re-trickle operation)
+  if((currentWeight > -0.3) && (currentWeight < (targetWeight + 0.5)))
   {
-    Serial.println("Weight within range of -0.5gr and (targetWeight + 0.5gr), advancing to dispense state");
+    Serial.println("Weight within range of -0.2gr and (targetWeight + 0.5gr), evaluating for advance to dispense state");
     // Clear flags, re-zero scale, and advance to Dispense state
     firstReadyUpdate = true;
     firstIdleUpdate = true;
     
-    // Re-zero the scale if we are close enough to zero when the cup is replaced
-    if((currentWeight > -0.5) && (currentWeight < 0.5))
+    // Verify we don't have static drift with a longer measurement compared against our previous one before re-zeroing to start a dispense operation
+    if((currentWeight > -0.3) && (currentWeight < 0.3))
     {
+      float newWeight = StableWeight(1000);
+      
+      // Wait for truly stable weight measurement before proceeding to zero the scale
+      while(newWeight != currentWeight)
+      {
+        currentWeight = newWeight;
+        newWeight = StableWeight(1000);
+      }
+
       zeroScale();
     }
     return DISPENSE_STATE;
@@ -888,8 +901,8 @@ int DispenseState()
       dispenseWeight = StableWeight(SHORT);
       weightDiff = targetWeight - dispenseWeight;
     }
-    // Underthrow, need a second bulk pulse
-    else if(weightDiff > 1)
+    // Underthrow, need a second bulk pulse (second bulk will activate for quantities larger than 1.75gr)
+    else if(weightDiff > 1.75)
     {
       // Handle extreme underthrow case (return to ready state or go to error state in this instance)
       if(weightDiff > targetWeight * 0.5)
@@ -925,7 +938,7 @@ int DispenseState()
       weightDiff = targetWeight - dispenseWeight;
 
       // Take a long measurement if the weightDiff is small
-      if(weightDiff < 0.1 && weightDiff > -0.1)
+      if(weightDiff < 0.2 && weightDiff > -0.1)
       {
         dispenseWeight = StableWeight(LONG);
         weightDiff = targetWeight - dispenseWeight;
@@ -953,7 +966,7 @@ int DispenseState()
         return EVALUATE_STATE;
       }
       // Fine tune calibration on close calls to avoid overthrows
-      else if(weightDiff < 0.1)
+      else if(weightDiff < 0.15)
       {
         Serial.println("Second bulk pulse too close to target, adjusting calibration");
         secondBulkCalibration = secondBulkCalibration - 0.005;
@@ -998,7 +1011,7 @@ int DispenseState()
     weightDiff = targetWeight - dispenseWeight;
 
     // Take a long measurement if the weightDiff is small
-    if(weightDiff < 0.1 && weightDiff > -0.1)
+    if(weightDiff < 0.2 && weightDiff > -0.1)
     {
       dispenseWeight = StableWeight(LONG);
       weightDiff = targetWeight - dispenseWeight;
@@ -1026,7 +1039,7 @@ int DispenseState()
       return EVALUATE_STATE;
     }
     // Fine tune calibration on close calls to avoid overthrows
-    else if(weightDiff < 0.1)
+    else if(weightDiff < 0.15)
     {
       Serial.println("Second bulk pulse too close to target, adjusting calibration");
       secondBulkCalibration = secondBulkCalibration - 0.005;
@@ -1087,7 +1100,7 @@ int DispenseState()
     Serial.println(remainder, 6);
 
     // Check the remainder to see if we need to add an extra kernel
-    if(remainder >= (0.49 * errorMargin))
+    if(remainder >= (0.60 * errorMargin))
     {
       Serial.print("Adding kernel because remainder = ");
       Serial.println(remainder, 6);
@@ -1167,11 +1180,11 @@ int DispenseState()
     dispenseWeight = StableWeight(LONG);
     weightDiff = targetWeight - dispenseWeight;
 
-    // Overthrow case
+    // Overthrow and perfect throw cases
     if(weightDiff < (-1.2 * errorMargin))
     {
       // Handle case of overthrow only 1 tick past errorMargin (0.02 over) on a long throw
-      if(kernels > 15 && (weightDiff > ((-1.2 * errorMargin) - 0.02)))
+      if(kernels > 20 && (weightDiff > ((-1.2 * errorMargin) - 0.02)))
       {
         Serial.println("Tiny overthrow on a long trickle, exiting to evaluate");
         smallIncreaseTrickleCalibration();
@@ -1184,6 +1197,14 @@ int DispenseState()
 
       return EVALUATE_STATE;
     }
+    // Very slight overthrow case (but within the error margin)
+    else if(weightDiff < 0)
+    {
+      Serial.println("Slight overthrow within the error margin, exiting to evaluate");
+      smallIncreaseTrickleCalibration();
+
+      return EVALUATE_STATE;
+    }
     // Perfect throw case
     else if(weightDiff < 0.01)
     {
@@ -1192,7 +1213,7 @@ int DispenseState()
 
       return EVALUATE_STATE;
     }
-    // Underthrow case
+    // Underthrow cases
     else
     {
       // Handle extreme underthrow
@@ -1204,15 +1225,36 @@ int DispenseState()
       }
       Serial.println("Trickle did not reach targetWeight, restarting the trickle");
 
-      // Adjust calibration for underthrow of at least 4 kernels
-      if(weightDiff > (3 * errorMargin))
+      // Adjust calibration for underthrow of at least 4 kernels (on long throws we are targeting 3 kernels under the target)
+      if(weightDiff > (3.2 * errorMargin))
       {
-        decreaseTrickleCalibration();
+        // Smaller calibration tweak for those long throws
+        if(kernels > 20)
+        {
+          smallDecreaseTrickleCalibration();
+        }
+        else
+        {
+          decreaseTrickleCalibration();
+        }
       }
-      // Do a tiny calibration change for underthrow of only 2 kernels
+      // Do a tiny calibration change for underthrow of 2 kernels or more for short throws
       else if(weightDiff > (1.2 * errorMargin))
       {
-        smallDecreaseTrickleCalibration();
+        if(kernels > 50)
+        {
+          // Do nothing for very large throws
+        }
+        else if(kernels > 20)
+        {
+          // Tiny adjustment for moderately large throws
+          tinyDecreaseTrickleCalibration();
+        }
+        else
+        {
+          // Small adjustment for small throws
+          smallDecreaseTrickleCalibration();
+        }
       }
     }
   }
@@ -1680,5 +1722,15 @@ void smallDecreaseTrickleCalibration()
   SetKernelWeight(curKernel * 0.99);
 
   Serial.print("Adjusting calibration down by 1%, kernelWeight = ");
+  Serial.println(GetKernelWeight(), 6);
+}
+
+void tinyDecreaseTrickleCalibration()
+{
+  // Adjust kernel weight to be slightly smaller
+  float curKernel = GetKernelWeight();
+  SetKernelWeight(curKernel * 0.995);
+
+  Serial.print("Adjusting calibration down by 0.5%, kernelWeight = ");
   Serial.println(GetKernelWeight(), 6);
 }

@@ -12,7 +12,7 @@ MoToStepper bulk(STEPS_PER_REV, STEPDIR);
 static float kernelWeight = 0.021; // Weight of single kernel in grains for trickler
 static float grainsPerRev = 65.00; // Weight of powder dumped by bulk in one full revolution
 
-static int motorDirection = 1;
+int stepperMotorDirection = 1;
 
 // MotorSetup()
 // Attachs motor pins and enable pins for MoToStepper objects
@@ -40,7 +40,7 @@ int TrickleDispense(int kernels)
   int steps = (STEPS_PER_REV / KERNELS_PER_REV) * kernels;
 
   // Command motor to begin moving the calculated number of steps
-  trickler.move(motorDirection * steps);
+  trickler.move(stepperMotorDirection * steps);
 
   return steps;
 }
@@ -80,7 +80,7 @@ void BulkDispense(float targetWeight, int recover)
   targetSteps = targetSteps + recover;
 
   // Trigger bulk to move that many steps
-  bulk.move(motorDirection * targetSteps);
+  bulk.move(stepperMotorDirection * targetSteps);
 }
 
 // BulkRetract()
@@ -88,7 +88,7 @@ void BulkDispense(float targetWeight, int recover)
 void BulkRetract(int steps)
 {
   // Turn the steps value negative before moving the desired number of steps
-  bulk.move((-motorDirection) * steps);
+  bulk.move((-stepperMotorDirection) * steps);
 }
 
 // EndBulk()
@@ -142,12 +142,12 @@ bool SetMotorDirection(int direction)
 {
   if(direction > 0 )
   {
-    motorDirection = 1;
+    stepperMotorDirection = 1;
     return true;
   }
   else
   {
-    motorDirection = -1;
+    stepperMotorDirection = -1;
     return false;
   }
 

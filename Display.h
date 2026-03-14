@@ -17,7 +17,7 @@
 
 // Current software version
 #define VERSION_MAJOR 1
-#define VERSION_MINOR 1
+#define VERSION_MINOR 2
 
 // Display constants
 #define LCD_COLS 20
@@ -27,7 +27,7 @@
 // Initializes the LCD and prints the initial splash screen displayed during setup state
 // Returns true on success, or false on failure
 bool LcdSetup(char* response);
-void WaitingToCalibrate();
+void WaitingToCalibrate(int motorDirection);
 void MotorDirectionSetup();
 void MotorDirectionStored(int direction);
 void CalibrationScreen();

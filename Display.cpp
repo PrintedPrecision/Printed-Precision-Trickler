@@ -68,7 +68,7 @@ bool LcdSetup(char* response)
 
 // WaitingToCalibrate()
 // Displayed during Setup state, while waiting for the enable toggle to be pressed before exiting Setup state
-void WaitingToCalibrate()
+void WaitingToCalibrate(int motorDirection)
 {
   // Print display lines 1 and 2
   clearLine(0);
@@ -85,12 +85,13 @@ void WaitingToCalibrate()
   // Print display line 3
   clearLine(2);
   lcd.setCursor(0,2);
-  lcd.print("    Press Enable    ");
+  lcd.print("Enable to Calibrate!");
 
   // Print display line 4
   clearLine(3);
   lcd.setCursor(0,3);
-  lcd.print("    To Calibrate    ");
+  lcd.print("Motor Direction = ");
+  lcd.print(motorDirection);
 }
 
 void MotorDirectionSetup()
