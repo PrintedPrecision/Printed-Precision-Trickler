@@ -1123,9 +1123,9 @@ int DispenseState()
     }
 
     // Adjust kernel target for longer trickles
-    if(weightDiff > 0.75)
+    if(weightDiff > 0.8)
     {
-      kernels = kernels - 3;
+      kernels = kernels - 4;
     }
     else if(weightDiff > 0.4)
     {
@@ -1226,7 +1226,7 @@ int DispenseState()
       Serial.println("Trickle did not reach targetWeight, restarting the trickle");
 
       // Adjust calibration for underthrow of at least 4 kernels (on long throws we are targeting 3 kernels under the target)
-      if(weightDiff > (3.2 * errorMargin))
+      if(weightDiff > (3.5 * errorMargin))
       {
         // Smaller calibration tweak for those long throws
         if(kernels > 20)
